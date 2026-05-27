@@ -1,0 +1,66 @@
+from rest_framework.permissions import BasePermission, SAFE_METHODS
+
+
+class EsAdmin(BasePermission):
+    """
+    Solo usuarios con is_staff=True tienen acceso total.
+    """
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and request.user.is_staff)
+
+
+class EsOperador(BasePermission):
+    """
+    Usuarios del grupo 'Operadores' pueden leer, crear y editar.
+    No pueden eliminar.
+    """
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        if request.user.is_staff:
+            return True
+        if request.method == "DELETE":
+            return False
+        return request.user.groups.filter(name="Operadores").exists()
+
+
+class EsUsuarioOAdmin(BasePermission):
+    """
+    Cualquier usuario autenticado puede leer.
+    Solo admin puede escribir.
+    """
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        if request.method in SAFE_METHODS:
+            return True
+        return request.user.is_staff
+
+
+class EsPropietarioOAdmin(BasePermission):
+    """
+    El usuario solo puede ver y editar sus propias reservas.
+    El admin puede ver y editar todo.
+    """
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated)
+
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_staff:
+            return True
+        # Para reservas: verificar que el pasajero coincida con el usuario
+        if hasattr(obj, "pasajero"):
+            return obj.pasajero.email == request.user.email
+        return False
+
+
+class SoloLectura(BasePermission):
+    """
+    Permite solo métodos seguros (GET, HEAD, OPTIONS).
+    """
+    def has_permission(self, request, view):
+        return bool(
+            request.user and
+            request.user.is_authenticated and
+            request.method in SAFE_METHODS
+        )
