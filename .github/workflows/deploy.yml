@@ -55,7 +55,7 @@ jobs:
           DB_PORT:       5432
           TEST_DB_NAME:  skyops_test_db
           CORS_ALLOW_ALL_ORIGINS: True
-        run: uv run python manage.py test airport --verbosity=2
+        run: uv run python manage.py test --verbosity=2
 
   # ── Job 2: Deploy ─────────────────────────────────────────
   deploy:
