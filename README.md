@@ -1,12 +1,14 @@
 # ✈️ SkyOps API
 
-Sistema de Control de Vuelos — API REST construida con Django y PostgreSQL.
+Sistema de Control de Vuelos — API REST construida con Django y PostgreSQL, desplegada en Azure con CI/CD automático.
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue)
+![Python](https://img.shields.io/badge/Python-3.12+-blue)
 ![Django](https://img.shields.io/badge/Django-5.0+-green)
 ![DRF](https://img.shields.io/badge/DRF-3.15+-red)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-blue)
 ![Tests](https://img.shields.io/badge/Tests-86%20passed-brightgreen)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-black)
+![Deploy](https://img.shields.io/badge/Deploy-Azure%20VM-0078D4)
 
 ---
 
@@ -24,6 +26,8 @@ Sistema de Control de Vuelos — API REST construida con Django y PostgreSQL.
 - [Filtros](#filtros)
 - [Tests](#tests)
 - [Roles y permisos](#roles-y-permisos)
+- [Despliegue en Azure](#despliegue-en-azure)
+- [CI/CD con GitHub Actions](#cicd-con-github-actions)
 
 ---
 
@@ -31,11 +35,15 @@ Sistema de Control de Vuelos — API REST construida con Django y PostgreSQL.
 
 SkyOps es una API REST para la gestión y control operativo de un aeropuerto. Permite administrar vuelos, pasajeros, reservas, tripulación, aeronaves e incidentes con autenticación JWT y control de acceso por roles.
 
+🌐 **API en producción:** `https://alba-vuelos.uaeftt-ute.site/api/`
+📖 **Documentación Swagger:** `https://alba-vuelos.uaeftt-ute.site/api/docs/`
+❤️ **Health check:** `https://alba-vuelos.uaeftt-ute.site/api/health/`
+
 ---
 
 ## Tecnologías
 
-- **Python 3.11+**
+- **Python 3.12**
 - **Django 5.0** — framework web
 - **Django REST Framework** — API REST
 - **PostgreSQL** — base de datos
@@ -44,6 +52,10 @@ SkyOps es una API REST para la gestión y control operativo de un aeropuerto. Pe
 - **django-filter** — filtros avanzados
 - **pytest-django** — tests automatizados
 - **uv** — gestor de paquetes
+- **Gunicorn** — servidor WSGI para producción
+- **Nginx** — reverse proxy
+- **GitHub Actions** — CI/CD automático
+- **Azure VM** — infraestructura cloud
 
 ---
 
@@ -51,6 +63,9 @@ SkyOps es una API REST para la gestión y control operativo de un aeropuerto. Pe
 
 ```
 skyops/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml          # Pipeline CI/CD
 ├── config/
 │   ├── settings.py
 │   ├── urls.py
@@ -104,12 +119,6 @@ uv venv
 # Mac/Linux
 source .venv/bin/activate
 
-uv pip install -r requirements.txt
-```
-
-O con pyproject.toml:
-
-```bash
 uv sync
 ```
 
@@ -163,33 +172,33 @@ ALTER USER skyops_user CREATEDB;
 ### Aplicar migraciones
 
 ```bash
-python manage.py migrate
+uv run python manage.py migrate
 ```
 
 ### Crear superusuario
 
 ```bash
-python manage.py createsuperuser
+uv run python manage.py createsuperuser
 ```
 
 ### Cargar datos de prueba
 
 ```bash
 # Windows
-Get-Content seed_data.py | python manage.py shell
+Get-Content seed_data.py | uv run python manage.py shell
 
 # Mac/Linux
-python manage.py shell < seed_data.py
+uv run python manage.py shell < seed_data.py
 ```
 
 ### Crear grupos de usuarios
 
 ```bash
 # Windows
-Get-Content crear_grupos.py | python manage.py shell
+Get-Content crear_grupos.py | uv run python manage.py shell
 
 # Mac/Linux
-python manage.py shell < crear_grupos.py
+uv run python manage.py shell < crear_grupos.py
 ```
 
 ---
@@ -197,7 +206,7 @@ python manage.py shell < crear_grupos.py
 ## Uso
 
 ```bash
-python manage.py runserver
+uv run python manage.py runserver
 ```
 
 | URL | Descripción |
@@ -260,7 +269,7 @@ Authorization: Bearer <access_token>
 ### Ejemplo de login
 
 ```bash
-curl -X POST http://127.0.0.1:8000/api/auth/login/ \
+curl -X POST https://alba-vuelos.uaeftt-ute.site/api/auth/login/ \
   -H "Content-Type: application/json" \
   -d '{"username": "admin", "password": "tu_password"}'
 ```
@@ -386,6 +395,142 @@ Los tests cubren:
 | `Tripulante` | Pilotos y auxiliares |
 | `AsignacionTripulacion` | Tripulantes por vuelo |
 | `Incidente` | Eventos reportados en vuelos |
+
+---
+
+## Despliegue en Azure
+
+La API está desplegada en una **Azure Virtual Machine** con Ubuntu 24.04 usando Gunicorn + Nginx.
+
+### Infraestructura
+
+| Componente | Detalle |
+|------------|---------|
+| **Servidor** | Azure VM — Standard B2ats v2 |
+| **OS** | Ubuntu 24.04 LTS |
+| **IP pública** | `68.211.88.144` |
+| **Dominio** | `alba-vuelos.uaeftt-ute.site` |
+| **Base de datos** | PostgreSQL 16 (local en VM) |
+| **Servidor WSGI** | Gunicorn — 3 workers |
+| **Reverse proxy** | Nginx 1.24 |
+| **Ruta del proyecto** | `/opt/skyops/` |
+
+### Servicios del sistema
+
+```bash
+# Ver estado de los servicios
+sudo systemctl status gunicorn-skyops
+sudo systemctl status nginx
+sudo systemctl status postgresql
+
+# Reiniciar Gunicorn después de cambios
+sudo systemctl restart gunicorn-skyops
+
+# Ver logs
+sudo tail -f /var/log/gunicorn-skyops-access.log
+sudo tail -f /var/log/nginx/skyops-access.log
+sudo journalctl -u gunicorn-skyops -f
+```
+
+### Variables de entorno en producción
+
+```env
+SECRET_KEY=<clave-segura>
+DEBUG=False
+ALLOWED_HOSTS=localhost,127.0.0.1,68.211.88.144,alba-vuelos.uaeftt-ute.site
+DB_NAME=skyops_db
+DB_USER=skyops_user
+DB_PASSWORD=<password-seguro>
+DB_HOST=localhost
+DB_PORT=5432
+CORS_ALLOW_ALL_ORIGINS=True
+```
+
+---
+
+## CI/CD con GitHub Actions
+
+El proyecto tiene un pipeline completo de **CI/CD automático** con GitHub Actions.
+
+🔗 **Repositorio:** `https://github.com/mateoalba/skyops`
+
+### Flujo del pipeline
+
+```
+push a main
+     │
+     ▼
+[Job 1: Tests] ── instala uv ── uv sync ── pytest (86 tests)
+     │
+     │ (solo si todos los tests pasan ✅)
+     ▼
+[Job 2: Deploy] ── SSH a VM ── git pull ── uv sync ── migrate ── collectstatic ── restart
+```
+
+### Archivo de workflow
+
+`.github/workflows/deploy.yml`
+
+```yaml
+name: SkyOps — CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: skyops_test_db
+          POSTGRES_USER: skyops_user
+          POSTGRES_PASSWORD: skyops_pass
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - run: uv python install 3.12
+      - run: uv sync
+      - run: uv run python manage.py test --verbosity=2
+
+  deploy:
+    name: Deploy to Azure VM
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy via SSH
+        run: |
+          ssh root@68.211.88.144 << 'ENDSSH'
+            cd /opt/skyops
+            git pull origin main
+            uv sync --frozen
+            uv run python manage.py migrate --noinput
+            uv run python manage.py collectstatic --noinput --clear
+            sudo systemctl restart gunicorn-skyops
+            sudo systemctl restart nginx
+          ENDSSH
+```
+
+### GitHub Secrets configurados
+
+| Secret | Descripción |
+|--------|-------------|
+| `VPS_SSH_KEY` | Clave privada SSH para conectarse a la VM |
+| `VPS_HOST` | IP pública del servidor (`68.211.88.144`) |
+| `VPS_USERNAME` | Usuario SSH (`root`) |
+| `DEPLOY_PATH` | Ruta del proyecto (`/opt/skyops`) |
+
+### Historial de deploys
+
+Los deploys se pueden monitorear en:
+`https://github.com/mateoalba/skyops/actions`
 
 ---
 
