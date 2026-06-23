@@ -7,7 +7,7 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="usuario.email", read_only=True)
     nombre_completo = serializers.SerializerMethodField()
     aeropuerto_codigo = serializers.CharField(
-        source="aeropuerto_asignado.codigo_iata", read_only=True
+        source="aeropuerto_asignado.codigo_iata", read_only=True, default=None
     )
     aeropuerto_ciudad = serializers.CharField(
         source="aeropuerto_asignado.ciudad", read_only=True
