@@ -105,6 +105,7 @@ jobs:
             echo "── 6. Verificando salud de la API ──"
             sleep 3
             curl -sf http://127.0.0.1/api/health/ && echo "API OK" || echo "API ERROR"
+            
 
             echo "Despliegue completado exitosamente"
           ENDSSH
