@@ -12,6 +12,7 @@ from .terminal import TerminalSerializer
 from .pista_aterrizaje import PistaAterrizajeSerializer
 from .asignacion_pista import AsignacionPistaSerializer
 from .horario_vuelo import HorarioVueloSerializer
+from .escala_vuelo import EscalaVueloSerializer
 from .auth import (
     CustomTokenObtainPairSerializer,
     RegistroUsuarioSerializer,
@@ -38,4 +39,5 @@ __all__ = [
     "PerfilUsuarioSerializer",
     "CambiarPasswordSerializer",
     "HorarioVueloSerializer",
+    "EscalaVueloSerializer",
 ]

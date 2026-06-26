@@ -12,6 +12,7 @@ from .terminal import Terminal
 from .pista_aterrizaje import PistaAterrizaje
 from .asignacion_pista import AsignacionPista
 from .horario_vuelo import HorarioVuelo
+from .escala_vuelo import EscalaVuelo
 
 
 __all__ = [
@@ -29,4 +30,5 @@ __all__ = [
     "PistaAterrizaje",
     "AsignacionPista",
     "HorarioVuelo",
+    "EscalaVuelo",
 ]
