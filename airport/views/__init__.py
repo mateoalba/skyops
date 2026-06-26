@@ -8,6 +8,11 @@ from .reserva import ReservaViewSet
 from .tripulante import TripulanteViewSet
 from .asignacion_tripulacion import AsignacionTripulacionViewSet
 from .incidente import IncidenteViewSet
+from .terminal import TerminalViewSet
+from .pista_aterrizaje import PistaAterrizajeViewSet
+from .asignacion_pista import AsignacionPistaViewSet
+from .horario_vuelo import HorarioVueloViewSet
+from .escala_vuelo import EscalaVueloViewSet
 from .health import health_check
 from .tipo_aeronave import TipoAeronaveViewSet
 from .equipaje import EquipajeViewSet
@@ -34,6 +39,11 @@ __all__ = [
     "TripulanteViewSet",
     "AsignacionTripulacionViewSet",
     "IncidenteViewSet",
+    "TerminalViewSet",
+    "PistaAterrizajeViewSet",
+    "AsignacionPistaViewSet",
+    "HorarioVueloViewSet",
+    "EscalaVueloViewSet",
     "health_check",
     "LoginView",
     "RefreshTokenView",

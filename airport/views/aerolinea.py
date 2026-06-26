@@ -15,3 +15,5 @@ class AerolineaViewSet(viewsets.ModelViewSet):
     search_fields = ["nombre", "codigo_iata", "pais"]
     ordering_fields = ["nombre", "creado_en"]
     ordering = ["nombre"]
+
+

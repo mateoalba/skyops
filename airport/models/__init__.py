@@ -13,6 +13,11 @@ from .equipaje import Equipaje
 from .tarjeta_embarque import TarjetaEmbarque
 from .categoria_pasajero import CategoriaPasajero
 from .notificacion import Notificacion
+from .terminal import Terminal
+from .pista_aterrizaje import PistaAterrizaje
+from .asignacion_pista import AsignacionPista
+from .horario_vuelo import HorarioVuelo
+from .escala_vuelo import EscalaVuelo
 
 __all__ = [
     "Aerolinea",
@@ -25,9 +30,14 @@ __all__ = [
     "Tripulante",
     "AsignacionTripulacion",
     "Incidente",
-    "TipoAeronave",      # 👈 nuevo
-    "Equipaje",           # 👈 nuevo
-    "TarjetaEmbarque",    # 👈 nuevo
-    "CategoriaPasajero",  # 👈 nuevo
-    "Notificacion",       # 👈 nuevo
+    "TipoAeronave",
+    "Equipaje",
+    "TarjetaEmbarque",
+    "CategoriaPasajero",
+    "Notificacion",
+    "Terminal",
+    "PistaAterrizaje",
+    "AsignacionPista",
+    "HorarioVuelo",
+    "EscalaVuelo",
 ]
