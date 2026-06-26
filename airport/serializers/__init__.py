@@ -9,6 +9,15 @@ from .tripulante import TripulanteSerializer
 from .asignacion_tripulacion import AsignacionTripulacionSerializer
 from .incidente import IncidenteSerializer
 from .terminal import TerminalSerializer
+from .pista_aterrizaje import PistaAterrizajeSerializer
+from .asignacion_pista import AsignacionPistaSerializer
+from .horario_vuelo import HorarioVueloSerializer
+from .escala_vuelo import EscalaVueloSerializer
+from .tipo_aeronave import TipoAeronaveReadSerializer, TipoAeronaveWriteSerializer
+from .equipaje import EquipajeReadSerializer, EquipajeWriteSerializer
+from .tarjeta_embarque import TarjetaEmbarqueReadSerializer, TarjetaEmbarqueWriteSerializer
+from .categoria_pasajero import CategoriaPasajeroReadSerializer, CategoriaPasajeroWriteSerializer
+from .notificacion import NotificacionReadSerializer, NotificacionWriteSerializer
 from .auth import (
     CustomTokenObtainPairSerializer,
     RegistroUsuarioSerializer,
@@ -28,6 +37,20 @@ __all__ = [
     "AsignacionTripulacionSerializer",
     "IncidenteSerializer",
     "TerminalSerializer",
+    "PistaAterrizajeSerializer",
+    "AsignacionPistaSerializer",
+    "HorarioVueloSerializer",
+    "EscalaVueloSerializer",
+    "TipoAeronaveReadSerializer",
+    "TipoAeronaveWriteSerializer",
+    "EquipajeReadSerializer",
+    "EquipajeWriteSerializer",
+    "TarjetaEmbarqueReadSerializer",
+    "TarjetaEmbarqueWriteSerializer",
+    "CategoriaPasajeroReadSerializer",
+    "CategoriaPasajeroWriteSerializer",
+    "NotificacionReadSerializer",
+    "NotificacionWriteSerializer",
     "CustomTokenObtainPairSerializer",
     "RegistroUsuarioSerializer",
     "PerfilUsuarioSerializer",

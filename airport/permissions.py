@@ -64,3 +64,9 @@ class SoloLectura(BasePermission):
             request.user.is_authenticated and
             request.method in SAFE_METHODS
         )
+# Aliases para compatibilidad
+IsOwnerOrAdmin = EsPropietarioOAdmin
+IsAdminUser = EsAdmin
+IsOperator = EsOperador
+IsAuthenticatedOrReadOnly = EsUsuarioOAdmin
+ReadOnly = SoloLectura

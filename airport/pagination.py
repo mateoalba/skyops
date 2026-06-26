@@ -16,3 +16,5 @@ class PaginacionEstandar(PageNumberPagination):
             "anterior": self.get_previous_link(),
             "resultados": data,
         })
+# Alias para compatibilidad
+StandardPagination = PaginacionEstandar
