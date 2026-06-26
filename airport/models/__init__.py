@@ -8,6 +8,11 @@ from .reserva import Reserva
 from .tripulante import Tripulante
 from .asignacion_tripulacion import AsignacionTripulacion
 from .incidente import Incidente
+from .tipo_aeronave import TipoAeronave
+from .equipaje import Equipaje
+from .tarjeta_embarque import TarjetaEmbarque
+from .categoria_pasajero import CategoriaPasajero
+from .notificacion import Notificacion
 
 __all__ = [
     "Aerolinea",
@@ -20,4 +25,9 @@ __all__ = [
     "Tripulante",
     "AsignacionTripulacion",
     "Incidente",
+    "TipoAeronave",      # 👈 nuevo
+    "Equipaje",           # 👈 nuevo
+    "TarjetaEmbarque",    # 👈 nuevo
+    "CategoriaPasajero",  # 👈 nuevo
+    "Notificacion",       # 👈 nuevo
 ]
