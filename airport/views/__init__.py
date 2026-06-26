@@ -11,6 +11,7 @@ from .incidente import IncidenteViewSet
 from .terminal import TerminalViewSet
 from .pista_aterrizaje import PistaAterrizajeViewSet
 from .asignacion_pista import AsignacionPistaViewSet
+from .horario_vuelo import HorarioVueloViewSet
 from .health import health_check
 from .auth import (
     LoginView,
@@ -35,6 +36,7 @@ __all__ = [
     "TerminalViewSet",
     "PistaAterrizajeViewSet",
     "AsignacionPistaViewSet",
+    "HorarioVueloViewSet",
     "health_check",
     "LoginView",
     "RefreshTokenView",

@@ -5,7 +5,7 @@ from airport.views import (
     PuertaViewSet, VueloViewSet, PasajeroViewSet,
     ReservaViewSet, TripulanteViewSet, AsignacionTripulacionViewSet,
     IncidenteViewSet, TerminalViewSet, PistaAterrizajeViewSet, 
-    AsignacionPistaViewSet, health_check,
+    AsignacionPistaViewSet, HorarioVueloViewSet, health_check,
     LoginView, RefreshTokenView, RegistroView,
     logout_view, PerfilView, cambiar_password,
 )
@@ -24,6 +24,8 @@ router.register("incidentes", IncidenteViewSet, basename="incidente")
 router.register("terminales", TerminalViewSet, basename="terminal")
 router.register("pistas", PistaAterrizajeViewSet, basename="pista")
 router.register("asignaciones-pista", AsignacionPistaViewSet, basename="asignacion-pista")
+router.register("horarios", HorarioVueloViewSet, basename="horario")
+
 
 auth_urlpatterns = [
     path("login/",            LoginView.as_view(),        name="auth-login"),
