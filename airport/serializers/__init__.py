@@ -9,6 +9,7 @@ from .tripulante import TripulanteSerializer
 from .asignacion_tripulacion import AsignacionTripulacionSerializer
 from .incidente import IncidenteSerializer
 from .terminal import TerminalSerializer
+from .pista_aterrizaje import PistaAterrizajeSerializer
 from .auth import (
     CustomTokenObtainPairSerializer,
     RegistroUsuarioSerializer,
@@ -28,6 +29,7 @@ __all__ = [
     "AsignacionTripulacionSerializer",
     "IncidenteSerializer",
     "TerminalSerializer",
+    "PistaAterrizajeSerializer",
     "CustomTokenObtainPairSerializer",
     "RegistroUsuarioSerializer",
     "PerfilUsuarioSerializer",

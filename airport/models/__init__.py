@@ -6,6 +6,7 @@ from .vuelo import Vuelo
 from .pasajero import Pasajero
 from .reserva import Reserva
 from .tripulante import Tripulante
+from .pista_aterrizaje import PistaAterrizaje
 from .asignacion_tripulacion import AsignacionTripulacion
 from .incidente import Incidente
 from .terminal import Terminal
@@ -22,4 +23,5 @@ __all__ = [
     "AsignacionTripulacion",
     "Incidente",
     "Terminal",
+    "PistaAterrizaje"
 ]
