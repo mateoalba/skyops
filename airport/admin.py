@@ -10,6 +10,7 @@ from airport.models import (
     Tripulante,
     AsignacionTripulacion,
     Incidente,
+    Terminal,
 )
 
 
@@ -97,3 +98,11 @@ class IncidenteAdmin(admin.ModelAdmin):
     list_filter = ["tipo", "severidad", "estado_resolucion"]
     search_fields = ["descripcion", "vuelo__numero_vuelo"]
     ordering = ["-reportado_en"]
+
+
+@admin.register(Terminal)
+class TerminalAdmin(admin.ModelAdmin):
+    list_display = ["codigo", "nombre", "aeropuerto", "capacidad_puertas", "estado"]
+    list_filter = ["estado", "aeropuerto"]
+    search_fields = ["nombre", "codigo"]
+    ordering = ["aeropuerto", "codigo"]

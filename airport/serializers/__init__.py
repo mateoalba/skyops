@@ -8,6 +8,7 @@ from .reserva import ReservaSerializer
 from .tripulante import TripulanteSerializer
 from .asignacion_tripulacion import AsignacionTripulacionSerializer
 from .incidente import IncidenteSerializer
+from .terminal import TerminalSerializer
 from .auth import (
     CustomTokenObtainPairSerializer,
     RegistroUsuarioSerializer,
@@ -26,6 +27,7 @@ __all__ = [
     "TripulanteSerializer",
     "AsignacionTripulacionSerializer",
     "IncidenteSerializer",
+    "TerminalSerializer",
     "CustomTokenObtainPairSerializer",
     "RegistroUsuarioSerializer",
     "PerfilUsuarioSerializer",

@@ -8,6 +8,7 @@ from .reserva import Reserva
 from .tripulante import Tripulante
 from .asignacion_tripulacion import AsignacionTripulacion
 from .incidente import Incidente
+from .terminal import Terminal
 
 __all__ = [
     "Aerolinea",
@@ -20,4 +21,5 @@ __all__ = [
     "Tripulante",
     "AsignacionTripulacion",
     "Incidente",
+    "Terminal",
 ]
