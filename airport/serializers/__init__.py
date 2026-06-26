@@ -15,6 +15,11 @@ from .auth import (
     CambiarPasswordSerializer,
 )
 
+from .tipo_aeronave import TipoAeronaveReadSerializer, TipoAeronaveWriteSerializer
+from .equipaje import EquipajeReadSerializer, EquipajeWriteSerializer
+from .tarjeta_embarque import TarjetaEmbarqueReadSerializer, TarjetaEmbarqueWriteSerializer
+from .categoria_pasajero import CategoriaPasajeroReadSerializer, CategoriaPasajeroWriteSerializer
+from .notificacion import NotificacionReadSerializer, NotificacionWriteSerializer
 __all__ = [
     "AerolineaSerializer",
     "AeropuertoSerializer",
@@ -30,4 +35,14 @@ __all__ = [
     "RegistroUsuarioSerializer",
     "PerfilUsuarioSerializer",
     "CambiarPasswordSerializer",
+    "TipoAeronaveReadSerializer",
+    "TipoAeronaveWriteSerializer",
+    "EquipajeReadSerializer",
+    "EquipajeWriteSerializer",
+    "TarjetaEmbarqueReadSerializer",
+    "TarjetaEmbarqueWriteSerializer",
+    "CategoriaPasajeroReadSerializer",
+    "CategoriaPasajeroWriteSerializer",
+    "NotificacionReadSerializer",
+    "NotificacionWriteSerializer",
 ]

@@ -9,6 +9,11 @@ from .tripulante import TripulanteViewSet
 from .asignacion_tripulacion import AsignacionTripulacionViewSet
 from .incidente import IncidenteViewSet
 from .health import health_check
+from .tipo_aeronave import TipoAeronaveViewSet
+from .equipaje import EquipajeViewSet
+from .tarjeta_embarque import TarjetaEmbarqueViewSet
+from .categoria_pasajero import CategoriaPasajeroViewSet
+from .notificacion import NotificacionViewSet
 from .auth import (
     LoginView,
     RefreshTokenView,
@@ -36,4 +41,9 @@ __all__ = [
     "logout_view",
     "PerfilView",
     "cambiar_password",
+    "TipoAeronaveViewSet",
+    "EquipajeViewSet",
+    "TarjetaEmbarqueViewSet",
+    "CategoriaPasajeroViewSet",
+    "NotificacionViewSet",
 ]
