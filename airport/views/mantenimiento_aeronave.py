@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -22,9 +23,28 @@ class MantenimientoAeronaveViewSet(viewsets.ModelViewSet):
             return [EsOperador()]
         return [EsAdmin()]
 
+    @action(detail=True, methods=["post"], url_path="completar")
+    def completar(self, request, pk=None):
+        mantenimiento = self.get_object()
+        if mantenimiento.estado == "completado":
+            return Response(
+                {"error": "Este mantenimiento ya está completado."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        costo_real = request.data.get("costo_real")
+        if not costo_real:
+            return Response(
+                {"error": "El campo costo_real es requerido para completar el mantenimiento."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        mantenimiento.estado = "completado"
+        mantenimiento.costo_real = costo_real
+        mantenimiento.fecha_fin_real = timezone.now()
+        mantenimiento.save()
+        return Response(self.get_serializer(mantenimiento).data)
+
     @action(detail=True, methods=["patch"], url_path="cambiar-estado")
     def cambiar_estado(self, request, pk=None):
-        """PATCH /api/mantenimientos/{id}/cambiar-estado/"""
         mantenimiento = self.get_object()
         nuevo_estado = request.data.get("estado")
         estados_validos = [e[0] for e in MantenimientoAeronave.Estado.choices]
@@ -39,7 +59,6 @@ class MantenimientoAeronaveViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path="activos")
     def activos(self, request):
-        """GET /api/mantenimientos/activos/"""
         qs = self.get_queryset().filter(
             estado__in=["programado", "en_progreso"]
         )

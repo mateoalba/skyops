@@ -17,6 +17,11 @@ from .auth import (
     PerfilView,
     cambiar_password,
 )
+from .perfil_usuario import PerfilUsuarioViewSet
+from .sesion_usuario import SesionUsuarioViewSet
+from .audit_log import AuditLogViewSet
+from .mantenimiento_aeronave import MantenimientoAeronaveViewSet
+from .certificacion_tripulante import CertificacionTripulanteViewSet
 
 __all__ = [
     "AerolineaViewSet",

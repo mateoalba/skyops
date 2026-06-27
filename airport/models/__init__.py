@@ -8,7 +8,11 @@ from .reserva import Reserva
 from .tripulante import Tripulante
 from .asignacion_tripulacion import AsignacionTripulacion
 from .incidente import Incidente
-
+from .perfil_usuario import PerfilUsuario
+from .sesion_usuario import SesionUsuario
+from .audit_log import AuditLog
+from .mantenimiento_aeronave import MantenimientoAeronave
+from .certificacion_tripulante import CertificacionTripulante
 __all__ = [
     "Aerolinea",
     "Aeropuerto",

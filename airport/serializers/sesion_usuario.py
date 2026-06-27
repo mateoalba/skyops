@@ -7,7 +7,7 @@ class SesionUsuarioSerializer(serializers.ModelSerializer):
     resultado_display = serializers.CharField(
         source="get_resultado_display", read_only=True
     )
-    duracion_minutos = serializers.SerializerMethodField()
+    duracion_segundos = serializers.SerializerMethodField()
 
     class Meta:
         model = SesionUsuario
@@ -22,12 +22,12 @@ class SesionUsuarioSerializer(serializers.ModelSerializer):
             "token_jti",
             "fecha_hora",
             "fecha_cierre",
-            "duracion_minutos",
+            "duracion_segundos",
         ]
         read_only_fields = ["id", "fecha_hora"]
 
-    def get_duracion_minutos(self, obj):
+    def get_duracion_segundos(self, obj):
         if obj.fecha_cierre is None:
             return None
         delta = obj.fecha_cierre - obj.fecha_hora
-        return int(delta.total_seconds() / 60)
+        return int(delta.total_seconds())

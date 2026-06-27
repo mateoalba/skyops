@@ -20,6 +20,7 @@ class MantenimientoAeronaveSerializer(serializers.ModelSerializer):
     )
     tipo_display = serializers.CharField(source="get_tipo_display", read_only=True)
     estado_display = serializers.CharField(source="get_estado_display", read_only=True)
+    duracion_real_horas = serializers.SerializerMethodField()
 
     class Meta:
         model = MantenimientoAeronave
@@ -44,10 +45,17 @@ class MantenimientoAeronaveSerializer(serializers.ModelSerializer):
             "costo_estimado",
             "costo_real",
             "horas_fuera_servicio",
+            "duracion_real_horas",
             "observaciones",
             "creado_en",
         ]
         read_only_fields = ["id", "creado_en"]
+
+    def get_duracion_real_horas(self, obj):
+        if obj.fecha_fin_real and obj.fecha_inicio:
+            delta = obj.fecha_fin_real - obj.fecha_inicio
+            return round(delta.total_seconds() / 3600, 2)
+        return None
 
     def validate(self, data):
         fecha_inicio = data.get("fecha_inicio")

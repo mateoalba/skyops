@@ -7,6 +7,8 @@ from airport.views import (
     IncidenteViewSet, health_check,
     LoginView, RefreshTokenView, RegistroView,
     logout_view, PerfilView, cambiar_password,
+    PerfilUsuarioViewSet, SesionUsuarioViewSet, AuditLogViewSet,
+    MantenimientoAeronaveViewSet, CertificacionTripulanteViewSet,
 )
 
 router = DefaultRouter()
@@ -20,6 +22,11 @@ router.register("reservas", ReservaViewSet, basename="reserva")
 router.register("tripulantes", TripulanteViewSet, basename="tripulante")
 router.register("asignaciones", AsignacionTripulacionViewSet, basename="asignacion")
 router.register("incidentes", IncidenteViewSet, basename="incidente")
+router.register("perfiles", PerfilUsuarioViewSet, basename="perfil-usuario")
+router.register("sesiones", SesionUsuarioViewSet, basename="sesion-usuario")
+router.register("auditlog", AuditLogViewSet, basename="audit-log")
+router.register("mantenimientos", MantenimientoAeronaveViewSet, basename="mantenimiento-aeronave")
+router.register("certificaciones", CertificacionTripulanteViewSet, basename="certificacion-tripulante")
 
 auth_urlpatterns = [
     path("login/",            LoginView.as_view(),        name="auth-login"),

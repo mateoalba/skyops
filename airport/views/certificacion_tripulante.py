@@ -30,15 +30,11 @@ class CertificacionTripulanteViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path="por-vencer")
     def por_vencer(self, request):
-        """GET /api/certificaciones/por-vencer/?dias=30"""
         dias = int(request.query_params.get("dias", 30))
         limite = date.today() + timedelta(days=dias)
         qs = self.get_queryset().filter(
             fecha_vencimiento__lte=limite,
             estado__in=["vigente", "por_vencer"],
         )
-        page = self.paginate_queryset(qs)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        return Response(self.get_serializer(qs, many=True).data)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)

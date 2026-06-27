@@ -45,6 +45,12 @@ class CertificacionTripulanteSerializer(serializers.ModelSerializer):
         return (obj.fecha_vencimiento - date.today()).days
 
     def validate(self, data):
+        tipo = data.get("tipo")
+        tipo_aeronave = (data.get("tipo_aeronave_habilitado") or "").strip()
+        if tipo == "habilitacion_tipo" and not tipo_aeronave:
+            raise serializers.ValidationError(
+                {"tipo_aeronave_habilitado": "Este campo es requerido para certificaciones de habilitación de tipo."}
+            )
         fecha_emision = data.get("fecha_emision")
         fecha_vencimiento = data.get("fecha_vencimiento")
         if fecha_emision and fecha_vencimiento and fecha_vencimiento <= fecha_emision:

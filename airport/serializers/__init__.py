@@ -14,6 +14,11 @@ from .auth import (
     PerfilUsuarioSerializer,
     CambiarPasswordSerializer,
 )
+from .perfil_usuario import PerfilUsuarioSerializer
+from .sesion_usuario import SesionUsuarioSerializer
+from .audit_log import AuditLogSerializer
+from .mantenimiento_aeronave import MantenimientoAeronaveSerializer
+from .certificacion_tripulante import CertificacionTripulanteSerializer
 
 __all__ = [
     "AerolineaSerializer",
