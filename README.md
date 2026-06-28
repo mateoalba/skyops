@@ -263,7 +263,7 @@ uv run python manage.py runserver
 | Horarios de Vuelo | `/api/horarios/` |
 | Escalas de Vuelo | `/api/escalas/` |
 
-### Módulo Pasajeros y Flota (5 tablas)
+### Módulo Pasajeros y Flota - Heymi de la Cruz (5 tablas)
 
 | Recurso | Endpoint base |
 |---------|--------------|
@@ -273,7 +273,7 @@ uv run python manage.py runserver
 | Categorías de Pasajero | `/api/categorias-pasajero/` |
 | Notificaciones | `/api/notificaciones/` |
 
-### Módulo Usuarios y Mantenimiento (5 tablas)
+### Módulo Usuarios y Mantenimiento - Marcelo Bacon (5 tablas)
 
 | Recurso | Endpoint base |
 |---------|--------------|
