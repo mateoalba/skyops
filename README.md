@@ -1,14 +1,14 @@
 # ✈️ SkyOps API
 
-Sistema de Control de Vuelos — API REST construida con Django y PostgreSQL, desplegada en Azure con CI/CD automático.
+Sistema de Control de Vuelos — API REST construida con Django y PostgreSQL, desplegada en Digital Ocean con CI/CD automático.
 
 ![Python](https://img.shields.io/badge/Python-3.12+-blue)
-![Django](https://img.shields.io/badge/Django-5.0+-green)
+![Django](https://img.shields.io/badge/Django-6.0+-green)
 ![DRF](https://img.shields.io/badge/DRF-3.15+-red)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-blue)
-![Tests](https://img.shields.io/badge/Tests-86%20passed-brightgreen)
+![Tests](https://img.shields.io/badge/Tests-passed-brightgreen)
 ![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-black)
-![Deploy](https://img.shields.io/badge/Deploy-Azure%20VM-0078D4)
+![Deploy](https://img.shields.io/badge/Deploy-Digital%20Ocean-0080FF)
 
 ---
 
@@ -26,7 +26,8 @@ Sistema de Control de Vuelos — API REST construida con Django y PostgreSQL, de
 - [Filtros](#filtros)
 - [Tests](#tests)
 - [Roles y permisos](#roles-y-permisos)
-- [Despliegue en Azure](#despliegue-en-azure)
+- [Tablas de la base de datos](#tablas-de-la-base-de-datos)
+- [Despliegue en Digital Ocean](#despliegue-en-digital-ocean)
 - [CI/CD con GitHub Actions](#cicd-con-github-actions)
 
 ---
@@ -34,6 +35,8 @@ Sistema de Control de Vuelos — API REST construida con Django y PostgreSQL, de
 ## Descripción
 
 SkyOps es una API REST para la gestión y control operativo de un aeropuerto. Permite administrar vuelos, pasajeros, reservas, tripulación, aeronaves e incidentes con autenticación JWT y control de acceso por roles.
+
+El proyecto fue desarrollado de manera grupal con 25 tablas distribuidas entre 3 integrantes.
 
 🌐 **API en producción:** `https://alba-vuelos.uaeftt-ute.site/api/`
 📖 **Documentación Swagger:** `https://alba-vuelos.uaeftt-ute.site/api/docs/`
@@ -44,7 +47,7 @@ SkyOps es una API REST para la gestión y control operativo de un aeropuerto. Pe
 ## Tecnologías
 
 - **Python 3.12**
-- **Django 5.0** — framework web
+- **Django 6.0** — framework web
 - **Django REST Framework** — API REST
 - **PostgreSQL** — base de datos
 - **SimpleJWT** — autenticación con tokens JWT
@@ -55,7 +58,7 @@ SkyOps es una API REST para la gestión y control operativo de un aeropuerto. Pe
 - **Gunicorn** — servidor WSGI para producción
 - **Nginx** — reverse proxy
 - **GitHub Actions** — CI/CD automático
-- **Azure VM** — infraestructura cloud
+- **Digital Ocean Droplet** — infraestructura cloud
 
 ---
 
@@ -65,7 +68,7 @@ SkyOps es una API REST para la gestión y control operativo de un aeropuerto. Pe
 skyops/
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml          # Pipeline CI/CD
+│       └── deploy.yml
 ├── config/
 │   ├── settings.py
 │   ├── urls.py
@@ -82,7 +85,22 @@ skyops/
 │   │   ├── reserva.py
 │   │   ├── tripulante.py
 │   │   ├── asignacion_tripulacion.py
-│   │   └── incidente.py
+│   │   ├── incidente.py
+│   │   ├── terminal.py
+│   │   ├── pista_aterrizaje.py
+│   │   ├── asignacion_pista.py
+│   │   ├── horario_vuelo.py
+│   │   ├── escala_vuelo.py
+│   │   ├── tipo_aeronave.py
+│   │   ├── equipaje.py
+│   │   ├── tarjeta_embarque.py
+│   │   ├── categoria_pasajero.py
+│   │   ├── notificacion.py
+│   │   ├── perfil_usuario.py
+│   │   ├── sesion_usuario.py
+│   │   ├── audit_log.py
+│   │   ├── mantenimiento_aeronave.py
+│   │   └── certificacion_tripulante.py
 │   ├── serializers/
 │   ├── views/
 │   ├── tests/
@@ -133,8 +151,6 @@ Edita el archivo `.env` con tus datos.
 ---
 
 ## Configuración
-
-Crea el archivo `.env` en la raíz del proyecto:
 
 ```env
 # Django
@@ -191,16 +207,6 @@ Get-Content seed_data.py | uv run python manage.py shell
 uv run python manage.py shell < seed_data.py
 ```
 
-### Crear grupos de usuarios
-
-```bash
-# Windows
-Get-Content crear_grupos.py | uv run python manage.py shell
-
-# Mac/Linux
-uv run python manage.py shell < crear_grupos.py
-```
-
 ---
 
 ## Uso
@@ -232,7 +238,7 @@ uv run python manage.py runserver
 | GET/PUT | `/api/auth/perfil/` | Ver y editar perfil |
 | POST | `/api/auth/cambiar-password/` | Cambiar contraseña |
 
-### Recursos principales
+### Recursos principales (10 tablas base)
 
 | Recurso | Endpoint base |
 |---------|--------------|
@@ -244,10 +250,40 @@ uv run python manage.py runserver
 | Pasajeros | `/api/pasajeros/` |
 | Reservas | `/api/reservas/` |
 | Tripulantes | `/api/tripulantes/` |
-| Asignaciones | `/api/asignaciones/` |
+| Asignaciones Tripulación | `/api/asignaciones/` |
 | Incidentes | `/api/incidentes/` |
 
-Cada recurso soporta: `GET` (listar), `POST` (crear), `GET /{id}/` (detalle), `PUT /{id}/` (editar), `PATCH /{id}/` (editar parcial), `DELETE /{id}/` (eliminar).
+### Módulo Operaciones — Mateo Alba (5 tablas)
+
+| Recurso | Endpoint base |
+|---------|--------------|
+| Terminales | `/api/terminales/` |
+| Pistas de Aterrizaje | `/api/pistas/` |
+| Asignaciones de Pista | `/api/asignaciones-pista/` |
+| Horarios de Vuelo | `/api/horarios/` |
+| Escalas de Vuelo | `/api/escalas/` |
+
+### Módulo Pasajeros y Flota (5 tablas)
+
+| Recurso | Endpoint base |
+|---------|--------------|
+| Tipos de Aeronave | `/api/tipos-aeronave/` |
+| Equipajes | `/api/equipajes/` |
+| Tarjetas de Embarque | `/api/tarjetas-embarque/` |
+| Categorías de Pasajero | `/api/categorias-pasajero/` |
+| Notificaciones | `/api/notificaciones/` |
+
+### Módulo Usuarios y Mantenimiento (5 tablas)
+
+| Recurso | Endpoint base |
+|---------|--------------|
+| Perfiles de Usuario | `/api/perfiles-usuario/` |
+| Sesiones de Usuario | `/api/sesiones-usuario/` |
+| Audit Log | `/api/audit-log/` |
+| Mantenimiento Aeronave | `/api/mantenimientos/` |
+| Certificaciones Tripulante | `/api/certificaciones/` |
+
+Cada recurso soporta: `GET` (listar), `POST` (crear), `GET /{id}/` (detalle), `PUT /{id}/` (editar completo), `PATCH /{id}/` (editar parcial), `DELETE /{id}/` (eliminar).
 
 ### Endpoints especiales
 
@@ -292,52 +328,48 @@ Respuesta:
 
 ## Filtros
 
-Todos los endpoints soportan filtros avanzados por query params:
-
 ### Vuelos
 
 ```
 GET /api/vuelos/?estado=programado
 GET /api/vuelos/?origen_codigo=UIO&destino_codigo=GYE
 GET /api/vuelos/?fecha=2026-05-27
-GET /api/vuelos/?fecha_desde=2026-05-27T00:00:00&fecha_hasta=2026-05-28T00:00:00
-GET /api/vuelos/?duracion_max=120
 GET /api/vuelos/?aerolinea_codigo=LA
 ```
 
-### Reservas
+### Pistas de Aterrizaje
 
 ```
-GET /api/reservas/?estado=confirmada&clase=ejecutiva
-GET /api/reservas/?numero_vuelo=LA101
-GET /api/reservas/?origen_codigo=UIO
+GET /api/pistas/?estado=operativa
+GET /api/pistas/?superficie=asfalto
+GET /api/pistas/?aeropuerto=UUID
 ```
 
-### Aeronaves
+### Terminales
 
 ```
-GET /api/aeronaves/?estado=activa
-GET /api/aeronaves/?capacidad_min=150&capacidad_max=200
-GET /api/aeronaves/?fabricante=Airbus
+GET /api/terminales/?estado=activa
+GET /api/terminales/?aeropuerto=UUID
 ```
 
-### Tripulantes
+### Horarios de Vuelo
 
 ```
-GET /api/tripulantes/?rol=piloto&disponible=true
-GET /api/tripulantes/?aerolinea_codigo=LA
+GET /api/horarios/?activo=true
+GET /api/horarios/?aerolinea=UUID
+GET /api/horarios/?origen=UUID&destino=UUID
 ```
 
-### Incidentes
+### Escalas de Vuelo
 
 ```
-GET /api/incidentes/?severidad=critica&estado_resolucion=abierto
-GET /api/incidentes/?tipo=tecnico
+GET /api/escalas/?vuelo=UUID
+GET /api/escalas/?aeropuerto_escala=UUID
 ```
 
 Todos los endpoints también soportan:
 - **Búsqueda:** `?search=texto`
-- **Ordenamiento:** `?ordering=campo` o `?ordering=-campo` (descendente)
+- **Ordenamiento:** `?ordering=campo` o `?ordering=-campo`
 - **Paginación:** `?page=2&limite=10`
 
 ---
@@ -345,20 +377,15 @@ Todos los endpoints también soportan:
 ## Tests
 
 ```bash
-pytest
+uv run pytest -v
 ```
 
-```
-86 passed in 34.49s
-```
-
-Los tests cubren:
-- Autenticación JWT (login, registro, perfil, logout)
-- CRUD completo de todos los recursos
+Los tests cubren todas las tablas implementadas:
+- Autenticación JWT
+- CRUD completo de los 25 recursos
 - Control de permisos por rol
 - Validaciones de modelos
 - Filtros y búsquedas
-- Endpoints especiales (cambiar estado, buscar por ruta)
 
 ---
 
@@ -369,19 +396,20 @@ Los tests cubren:
 | **Admin** | `is_staff=True` | ✅ | ✅ | ✅ | ✅ |
 | **Operador** | Grupo `Operadores` | ✅ | ✅ | ✅ | ❌ |
 | **Usuario** | Autenticado | ✅ vuelos | ❌ | ❌ | ❌ |
-| **Usuario** | Sus reservas | ✅ | ❌ | ✅ | ❌ |
 
 ### Usuarios de prueba
 
 | Usuario | Password | Rol |
 |---------|----------|-----|
-| `mateo` | (el que creaste) | Admin |
+| `mateo` | `dinosaurio12` | Admin |
 | `operador1` | `Operador123!` | Operador |
 | `usuario1` | `Usuario123!` | Usuario |
 
 ---
 
 ## Tablas de la base de datos
+
+### Tablas base (10)
 
 | Tabla | Descripción |
 |-------|-------------|
@@ -396,39 +424,68 @@ Los tests cubren:
 | `AsignacionTripulacion` | Tripulantes por vuelo |
 | `Incidente` | Eventos reportados en vuelos |
 
+### Módulo Operaciones — Mateo Alba (5)
+
+| Tabla | Descripción |
+|-------|-------------|
+| `Terminal` | Terminales del aeropuerto (T1, T2...) |
+| `PistaAterrizaje` | Pistas con longitud y estado |
+| `AsignacionPista` | Qué vuelo usa qué pista y cuándo |
+| `HorarioVuelo` | Horarios recurrentes por ruta |
+| `EscalaVuelo` | Aeropuerto intermedio de un vuelo |
+
+### Módulo Pasajeros y Flota (5)
+
+| Tabla | Descripción |
+|-------|-------------|
+| `TipoAeronave` | Catálogo de tipos de aeronave |
+| `Equipaje` | Maletas por reserva con peso y estado |
+| `TarjetaEmbarque` | Boarding pass por reserva |
+| `CategoriaPasajero` | VIP, Frequent Flyer, etc. |
+| `Notificacion` | Alertas al pasajero sobre su vuelo |
+
+### Módulo Usuarios y Mantenimiento (5)
+
+| Tabla | Descripción |
+|-------|-------------|
+| `PerfilUsuario` | Extensión del User de Django |
+| `SesionUsuario` | Historial de logins con IP |
+| `AuditLog` | Quién hizo qué sobre qué objeto |
+| `MantenimientoAeronave` | Mantenimientos programados |
+| `CertificacionTripulante` | Licencias y habilitaciones |
+
 ---
 
-## Despliegue en Azure
+## Despliegue en Digital Ocean
 
-La API está desplegada en una **Azure Virtual Machine** con Ubuntu 24.04 usando Gunicorn + Nginx.
+La API está desplegada en un **Digital Ocean Droplet** con Ubuntu usando Gunicorn + Nginx.
 
 ### Infraestructura
 
 | Componente | Detalle |
 |------------|---------|
-| **Servidor** | Azure VM — Standard B2ats v2 |
+| **Servidor** | Digital Ocean Droplet |
 | **OS** | Ubuntu 24.04 LTS |
-| **IP pública** | `68.211.88.144` |
+| **IP pública** | `147.182.179.6` |
 | **Dominio** | `alba-vuelos.uaeftt-ute.site` |
-| **Base de datos** | PostgreSQL 16 (local en VM) |
-| **Servidor WSGI** | Gunicorn — 3 workers |
-| **Reverse proxy** | Nginx 1.24 |
+| **Base de datos** | PostgreSQL 16 (local en Droplet) |
+| **Servidor WSGI** | Gunicorn |
+| **Reverse proxy** | Nginx |
 | **Ruta del proyecto** | `/opt/skyops/` |
 
 ### Servicios del sistema
 
 ```bash
-# Ver estado de los servicios
+# Ver estado
 sudo systemctl status gunicorn-skyops
 sudo systemctl status nginx
 sudo systemctl status postgresql
 
-# Reiniciar Gunicorn después de cambios
+# Reiniciar
 sudo systemctl restart gunicorn-skyops
 
 # Ver logs
 sudo tail -f /var/log/gunicorn-skyops-access.log
-sudo tail -f /var/log/nginx/skyops-access.log
 sudo journalctl -u gunicorn-skyops -f
 ```
 
@@ -437,7 +494,7 @@ sudo journalctl -u gunicorn-skyops -f
 ```env
 SECRET_KEY=<clave-segura>
 DEBUG=False
-ALLOWED_HOSTS=localhost,127.0.0.1,68.211.88.144,alba-vuelos.uaeftt-ute.site
+ALLOWED_HOSTS=147.182.179.6,alba-vuelos.uaeftt-ute.site
 DB_NAME=skyops_db
 DB_USER=skyops_user
 DB_PASSWORD=<password-seguro>
@@ -450,8 +507,6 @@ CORS_ALLOW_ALL_ORIGINS=True
 
 ## CI/CD con GitHub Actions
 
-El proyecto tiene un pipeline completo de **CI/CD automático** con GitHub Actions.
-
 🔗 **Repositorio:** `https://github.com/mateoalba/skyops`
 
 ### Flujo del pipeline
@@ -460,76 +515,24 @@ El proyecto tiene un pipeline completo de **CI/CD automático** con GitHub Actio
 push a main
      │
      ▼
-[Job 1: Tests] ── instala uv ── uv sync ── pytest (86 tests)
+[Job 1: Tests] ── instala uv ── uv sync ── pytest
      │
      │ (solo si todos los tests pasan ✅)
      ▼
-[Job 2: Deploy] ── SSH a VM ── git pull ── uv sync ── migrate ── collectstatic ── restart
-```
-
-### Archivo de workflow
-
-`.github/workflows/deploy.yml`
-
-```yaml
-name: SkyOps — CI/CD Pipeline
-
-on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-
-jobs:
-  test:
-    name: Run Tests
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: skyops_test_db
-          POSTGRES_USER: skyops_user
-          POSTGRES_PASSWORD: skyops_pass
-    steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
-      - run: uv python install 3.12
-      - run: uv sync
-      - run: uv run python manage.py test --verbosity=2
-
-  deploy:
-    name: Deploy to Azure VM
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Deploy via SSH
-        run: |
-          ssh root@68.211.88.144 << 'ENDSSH'
-            cd /opt/skyops
-            git pull origin main
-            uv sync --frozen
-            uv run python manage.py migrate --noinput
-            uv run python manage.py collectstatic --noinput --clear
-            sudo systemctl restart gunicorn-skyops
-            sudo systemctl restart nginx
-          ENDSSH
+[Job 2: Deploy] ── SSH a Droplet ── git pull ── uv sync ── migrate ── restart
 ```
 
 ### GitHub Secrets configurados
 
 | Secret | Descripción |
 |--------|-------------|
-| `VPS_SSH_KEY` | Clave privada SSH para conectarse a la VM |
-| `VPS_HOST` | IP pública del servidor (`68.211.88.144`) |
-| `VPS_USERNAME` | Usuario SSH (`root`) |
+| `VPS_SSH_KEY` | Clave privada SSH |
+| `VPS_HOST` | IP del servidor (`147.182.179.6`) |
+| `VPS_USERNAME` | Usuario SSH |
 | `DEPLOY_PATH` | Ruta del proyecto (`/opt/skyops`) |
 
 ### Historial de deploys
 
-Los deploys se pueden monitorear en:
 `https://github.com/mateoalba/skyops/actions`
 
 ---
