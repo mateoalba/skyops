@@ -539,4 +539,4 @@ push a main
 
 ## Licencia
 
-MIT
+MIT 2026
