@@ -20,9 +20,25 @@ class VueloViewSet(viewsets.ModelViewSet):
     ordering = ["salida_programada"]
 
     def get_permissions(self):
-        if self.action in ["list", "retrieve", "por_ruta"]:
+        if self.action in ["list", "retrieve", "por_ruta", "asientos_ocupados"]:
             return [SoloLectura()]
         return [EsOperador()]
+
+    @action(detail=True, methods=["get"], url_path="asientos-ocupados")
+    def asientos_ocupados(self, request, pk=None):
+        """
+        GET /api/vuelos/{id}/asientos-ocupados/
+        Devuelve solo los números de asiento ya reservados (no cancelados)
+        de este vuelo, sin exponer a quién pertenecen — así cualquier
+        pasajero puede pintar el mapa de asientos sin ver datos de otros.
+        """
+        vuelo = self.get_object()
+        asientos = (
+            vuelo.reservas.exclude(estado="cancelada")
+            .values_list("numero_asiento", flat=True)
+            .distinct()
+        )
+        return Response({"asientos_ocupados": list(asientos)})
 
     @action(detail=True, methods=["patch"], url_path="cambiar-estado")
     def cambiar_estado(self, request, pk=None):
