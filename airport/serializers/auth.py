@@ -2,8 +2,9 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from airport.models.perfil_usuario import PerfilUsuario
+from airport.models.pasajero import Pasajero
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -156,6 +157,34 @@ class RegistroUsuarioSerializer(serializers.ModelSerializer):
             cargo=PerfilUsuario.Cargo.USUARIO,
             **perfil_data,
         )
+
+        # Si el formulario trajo suficientes datos (documento + fecha de
+        # nacimiento), crea también el registro de Pasajero con el mismo
+        # email, para que el usuario pueda reservar vuelos a su propio
+        # nombre sin depender de un operador. Si falta algún dato, o ya
+        # existe un Pasajero con ese email/documento (creado antes por un
+        # operador), simplemente se omite: el usuario podrá reservar en
+        # cuanto ese Pasajero exista.
+        numero_documento = perfil_data.get("numero_documento")
+        fecha_nacimiento = perfil_data.get("fecha_nacimiento")
+        if numero_documento and fecha_nacimiento and not Pasajero.objects.filter(email=email).exists():
+            try:
+                with transaction.atomic():
+                    Pasajero.objects.create(
+                        nombre=validated_data.get("first_name", "") or email.split("@")[0],
+                        apellido=validated_data.get("last_name", "") or "",
+                        num_pasaporte=numero_documento,
+                        nacionalidad=perfil_data.get("pais", "") or "",
+                        fecha_nacimiento=fecha_nacimiento,
+                        email=email,
+                        telefono=perfil_data.get("telefono", "") or "",
+                    )
+            except IntegrityError:
+                # num_pasaporte ya usado por otro pasajero: no bloquea el
+                # registro del usuario, solo se omite la creación (savepoint
+                # aislado, no afecta la creación del User/PerfilUsuario).
+                pass
+
         return user
 
 

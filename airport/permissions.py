@@ -37,6 +37,30 @@ class EsUsuarioOAdmin(BasePermission):
         return request.user.is_staff
 
 
+class EsPasajeroOOperador(BasePermission):
+    """
+    Cualquier usuario autenticado puede crear/editar una reserva, siempre que
+    sea SU PROPIA reserva (el 'pasajero' de la reserva debe tener el mismo
+    email que su cuenta). Operador/Admin pueden reservar en nombre de
+    cualquier pasajero. La validación de "es mi propio pasajero" se hace en
+    el serializer (ReservaSerializer.validate), porque en create() todavía
+    no existe el objeto para has_object_permission.
+    """
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        if request.method == "DELETE":
+            return request.user.is_staff
+        return True
+
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_staff:
+            return True
+        if request.user.groups.filter(name="Operadores").exists():
+            return True
+        return obj.pasajero.email == request.user.email
+
+
 class EsPropietarioOAdmin(BasePermission):
     """
     El usuario solo puede ver y editar sus propias reservas.

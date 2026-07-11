@@ -2,7 +2,7 @@ from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from airport.models import Reserva
 from airport.serializers import ReservaSerializer
-from airport.permissions import EsAdmin, EsOperador, EsPropietarioOAdmin
+from airport.permissions import EsAdmin, EsPropietarioOAdmin, EsPasajeroOOperador
 from airport.filters import ReservaFilter
 
 
@@ -29,4 +29,4 @@ class ReservaViewSet(viewsets.ModelViewSet):
             return [EsAdmin()]
         if self.action in ["list", "retrieve"]:
             return [EsPropietarioOAdmin()]
-        return [EsOperador()]
+        return [EsPasajeroOOperador()]
