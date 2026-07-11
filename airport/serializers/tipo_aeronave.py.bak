@@ -4,6 +4,7 @@ from airport.models import TipoAeronave
 
 class TipoAeronaveReadSerializer(serializers.ModelSerializer):
     categoria_display = serializers.CharField(source="get_categoria_display", read_only=True)
+    total_aeronaves   = serializers.SerializerMethodField()
 
     class Meta:
         model = TipoAeronave
@@ -20,7 +21,11 @@ class TipoAeronaveReadSerializer(serializers.ModelSerializer):
             "velocidad_crucero_kmh",
             "descripcion",
             "en_produccion",
+            "total_aeronaves",
         ]
+
+    def get_total_aeronaves(self, obj):
+        return obj.aeronaves.count()
 
 
 class TipoAeronaveWriteSerializer(serializers.ModelSerializer):
