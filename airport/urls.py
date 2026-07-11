@@ -9,7 +9,9 @@ from airport.views import (
     TipoAeronaveViewSet, EquipajeViewSet, TarjetaEmbarqueViewSet,
     CategoriaPasajeroViewSet, NotificacionViewSet, health_check,
     LoginView, RefreshTokenView, RegistroView,
-    logout_view, PerfilView, cambiar_password,
+    logout_view, PerfilView, cambiar_password, google_login,
+    PerfilUsuarioViewSet, SesionUsuarioViewSet, AuditLogViewSet,
+    MantenimientoAeronaveViewSet, CertificacionTripulanteViewSet,
 )
 
 router = DefaultRouter()
@@ -33,6 +35,11 @@ router.register("equipajes", EquipajeViewSet, basename="equipaje")
 router.register("tarjetas-embarque", TarjetaEmbarqueViewSet, basename="tarjeta-embarque")
 router.register("categorias-pasajero", CategoriaPasajeroViewSet, basename="categoria-pasajero")
 router.register("notificaciones", NotificacionViewSet, basename="notificacion")
+router.register("perfiles-usuario", PerfilUsuarioViewSet, basename="perfil-usuario")
+router.register("sesiones-usuario", SesionUsuarioViewSet, basename="sesion-usuario")
+router.register("audit-log", AuditLogViewSet, basename="audit-log")
+router.register("mantenimientos", MantenimientoAeronaveViewSet, basename="mantenimiento")
+router.register("certificaciones", CertificacionTripulanteViewSet, basename="certificacion")
 
 auth_urlpatterns = [
     path("login/", LoginView.as_view(), name="auth-login"),
@@ -41,6 +48,7 @@ auth_urlpatterns = [
     path("logout/", logout_view, name="auth-logout"),
     path("perfil/", PerfilView.as_view(), name="auth-perfil"),
     path("cambiar-password/", cambiar_password, name="auth-cambiar-password"),
+    path("google/", google_login, name="auth-google"),
 ]
 
 urlpatterns = [

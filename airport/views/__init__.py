@@ -26,7 +26,13 @@ from .auth import (
     logout_view,
     PerfilView,
     cambiar_password,
+    google_login,
 )
+from .perfil_usuario import PerfilUsuarioViewSet
+from .sesion_usuario import SesionUsuarioViewSet
+from .audit_log import AuditLogViewSet
+from .mantenimiento_aeronave import MantenimientoAeronaveViewSet
+from .certificacion_tripulante import CertificacionTripulanteViewSet
 
 __all__ = [
     "AerolineaViewSet",
@@ -56,4 +62,10 @@ __all__ = [
     "TarjetaEmbarqueViewSet",
     "CategoriaPasajeroViewSet",
     "NotificacionViewSet",
+    "google_login",
+    "PerfilUsuarioViewSet",
+    "SesionUsuarioViewSet",
+    "AuditLogViewSet",
+    "MantenimientoAeronaveViewSet",
+    "CertificacionTripulanteViewSet",
 ]

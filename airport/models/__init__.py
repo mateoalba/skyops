@@ -18,6 +18,11 @@ from .pista_aterrizaje import PistaAterrizaje
 from .asignacion_pista import AsignacionPista
 from .horario_vuelo import HorarioVuelo
 from .escala_vuelo import EscalaVuelo
+from .perfil_usuario import PerfilUsuario
+from .sesion_usuario import SesionUsuario
+from .audit_log import AuditLog
+from .mantenimiento_aeronave import MantenimientoAeronave
+from .certificacion_tripulante import CertificacionTripulante
 
 __all__ = [
     "Aerolinea",
@@ -40,4 +45,9 @@ __all__ = [
     "AsignacionPista",
     "HorarioVuelo",
     "EscalaVuelo",
+    "PerfilUsuario",
+    "SesionUsuario",
+    "AuditLog",
+    "MantenimientoAeronave",
+    "CertificacionTripulante",
 ]
