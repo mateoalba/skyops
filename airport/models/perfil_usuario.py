@@ -18,6 +18,12 @@ class PerfilUsuario(models.Model):
         SUPERVISOR = "supervisor", "Supervisor"
         ANALISTA = "analista", "Analista"
         TECNICO = "tecnico", "Técnico"
+        USUARIO = "usuario", "Usuario"  # cuentas creadas por auto-registro público
+
+    class Genero(models.TextChoices):
+        FEMENINO = "femenino", "Femenino"
+        MASCULINO = "masculino", "Masculino"
+        PREFIERO_NO_DECIRLO = "prefiero_no_decirlo", "Prefiero no decirlo"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     usuario = models.OneToOneField(
@@ -30,12 +36,15 @@ class PerfilUsuario(models.Model):
         blank=True,
         related_name="perfiles_usuario",
     )
+    pais = models.CharField(max_length=100, blank=True, default="")
     tipo_documento = models.CharField(
-        max_length=20, choices=TipoDocumento.choices
+        max_length=20, choices=TipoDocumento.choices, blank=True, default=TipoDocumento.CEDULA
     )
-    numero_documento = models.CharField(max_length=30, unique=True)
+    numero_documento = models.CharField(max_length=30, unique=True, null=True, blank=True)
+    fecha_nacimiento = models.DateField(null=True, blank=True)
+    genero = models.CharField(max_length=25, choices=Genero.choices, blank=True, default="")
     telefono = models.CharField(max_length=20, blank=True)
-    cargo = models.CharField(max_length=20, choices=Cargo.choices)
+    cargo = models.CharField(max_length=20, choices=Cargo.choices, default=Cargo.USUARIO)
     foto_url = models.URLField(blank=True)
     activo = models.BooleanField(default=True)
     creado_en = models.DateTimeField(auto_now_add=True)
