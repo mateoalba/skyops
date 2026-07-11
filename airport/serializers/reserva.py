@@ -45,3 +45,19 @@ class ReservaSerializer(serializers.ModelSerializer):
             "reservado_en",
         ]
         read_only_fields = ["id", "codigo_reserva", "reservado_en"]
+
+    def validate(self, data):
+        request = self.context.get("request")
+        if request is None:
+            return data
+        user = request.user
+        if user.is_staff or user.groups.filter(name="Operadores").exists():
+            return data
+        # Un usuario normal solo puede reservar para sí mismo: el pasajero
+        # elegido debe tener el mismo email que su cuenta.
+        pasajero = data.get("pasajero") or getattr(self.instance, "pasajero", None)
+        if pasajero is None or pasajero.email != user.email:
+            raise serializers.ValidationError(
+                {"pasajero": "Solo puedes crear o editar reservas a tu propio nombre."}
+            )
+        return data
