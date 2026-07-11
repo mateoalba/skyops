@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from django.contrib.auth.models import User
@@ -6,7 +7,12 @@ from airport.models.perfil_usuario import PerfilUsuario
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """Agrega datos del usuario al token JWT."""
+    """
+    Login por correo electrónico (no por username).
+    Body esperado: { "email": "...", "password": "..." }
+    """
+
+    username_field = "email"
 
     @classmethod
     def get_token(cls, user):
@@ -17,25 +23,51 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
     def validate(self, attrs):
-        data = super().validate(attrs)
-        data["usuario"] = {
-            "id": self.user.id,
-            "username": self.user.username,
-            "email": self.user.email,
-            "nombre": self.user.first_name,
-            "apellido": self.user.last_name,
-            "es_staff": self.user.is_staff,
+        email = (attrs.get(self.username_field) or "").strip()
+        password = attrs.get("password")
+
+        user = User.objects.filter(email__iexact=email).first()
+        if user is None:
+            raise serializers.ValidationError(
+                {"detail": "Correo o contraseña incorrectos."}
+            )
+
+        authenticated_user = authenticate(
+            request=self.context.get("request"),
+            username=user.username,
+            password=password,
+        )
+        if authenticated_user is None:
+            raise serializers.ValidationError(
+                {"detail": "Correo o contraseña incorrectos."}
+            )
+
+        self.user = authenticated_user
+        refresh = self.get_token(self.user)
+
+        return {
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+            "usuario": {
+                "id": self.user.id,
+                "username": self.user.username,
+                "email": self.user.email,
+                "nombre": self.user.first_name,
+                "apellido": self.user.last_name,
+                "es_staff": self.user.is_staff,
+            },
         }
-        return data
 
 
 class RegistroUsuarioSerializer(serializers.ModelSerializer):
     """
-    Registro público. Crea el User de Django y, en la misma transacción, un
-    PerfilUsuario (cargo='usuario' por defecto) con los datos personales que
-    pide el formulario de la app: país, tipo/número de documento, fecha de
-    nacimiento, género y teléfono. Todos los campos de perfil son opcionales
-    para no romper integraciones que solo mandan username/email/password.
+    Registro público por correo electrónico. Crea el User de Django (con un
+    username interno autogenerado a partir del correo, no expuesto en la app
+    ni pedido en el formulario) y, en la misma transacción, un PerfilUsuario
+    (cargo='usuario' por defecto) con los datos personales del formulario:
+    país, tipo/número de documento, fecha de nacimiento, género y teléfono.
+    Todos los campos de perfil son opcionales para no romper integraciones
+    que solo mandan email/password.
     """
 
     password = serializers.CharField(write_only=True, min_length=8)
@@ -56,7 +88,6 @@ class RegistroUsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            "username",
             "email",
             "first_name",
             "last_name",
@@ -69,6 +100,13 @@ class RegistroUsuarioSerializer(serializers.ModelSerializer):
             "genero",
             "telefono",
         ]
+
+    def validate_email(self, value):
+        if not value:
+            raise serializers.ValidationError("El correo es obligatorio.")
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("Ya existe una cuenta registrada con ese correo.")
+        return value
 
     def validate(self, data):
         if data["password"] != data["password2"]:
@@ -83,6 +121,16 @@ class RegistroUsuarioSerializer(serializers.ModelSerializer):
                 )
         return data
 
+    @staticmethod
+    def _generar_username(email):
+        base = (email.split("@")[0] or "usuario").strip() or "usuario"
+        username = base
+        contador = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base}{contador}"
+            contador += 1
+        return username
+
     @transaction.atomic
     def create(self, validated_data):
         perfil_data = {
@@ -95,9 +143,10 @@ class RegistroUsuarioSerializer(serializers.ModelSerializer):
         }
         validated_data.pop("password2")
 
+        email = validated_data.get("email", "")
         user = User.objects.create_user(
-            username=validated_data["username"],
-            email=validated_data.get("email", ""),
+            username=self._generar_username(email),
+            email=email,
             first_name=validated_data.get("first_name", ""),
             last_name=validated_data.get("last_name", ""),
             password=validated_data["password"],
@@ -190,9 +239,3 @@ class CambiarPasswordSerializer(serializers.Serializer):
         if not user.check_password(value):
             raise serializers.ValidationError("La contraseña actual es incorrecta.")
         return value
-
-    def save(self):
-        user = self.context["request"].user
-        user.set_password(self.validated_data["password_nuevo"])
-        user.save()
-        return user

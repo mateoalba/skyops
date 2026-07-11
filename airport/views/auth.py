@@ -20,7 +20,7 @@ from airport.serializers.auth import (
 class LoginView(TokenObtainPairView):
     """
     POST /api/auth/login/
-    Body: { "username": "...", "password": "..." }
+    Body: { "email": "...", "password": "..." }
     Retorna: access token, refresh token y datos del usuario.
     """
     serializer_class = CustomTokenObtainPairSerializer
@@ -198,6 +198,8 @@ def cambiar_password(request):
         data=request.data, context={"request": request}
     )
     if serializer.is_valid():
-        serializer.save()
+        user = request.user
+        user.set_password(serializer.validated_data["password_nuevo"])
+        user.save()
         return Response({"mensaje": "Contraseña actualizada exitosamente."})
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
