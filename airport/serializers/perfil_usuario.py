@@ -15,6 +15,9 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
     tipo_documento_display = serializers.CharField(
         source="get_tipo_documento_display", read_only=True
     )
+    genero_display = serializers.CharField(
+        source="get_genero_display", read_only=True
+    )
     cargo_display = serializers.CharField(source="get_cargo_display", read_only=True)
 
     class Meta:
@@ -28,9 +31,13 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
             "aeropuerto_asignado",
             "aeropuerto_codigo",
             "aeropuerto_ciudad",
+            "pais",
             "tipo_documento",
             "tipo_documento_display",
             "numero_documento",
+            "fecha_nacimiento",
+            "genero",
+            "genero_display",
             "telefono",
             "cargo",
             "cargo_display",
