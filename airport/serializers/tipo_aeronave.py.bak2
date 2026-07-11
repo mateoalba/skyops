@@ -4,6 +4,7 @@ from airport.models import TipoAeronave
 
 class TipoAeronaveReadSerializer(serializers.ModelSerializer):
     categoria_display = serializers.CharField(source="get_categoria_display", read_only=True)
+    total_aeronaves   = serializers.SerializerMethodField()
 
     class Meta:
         model = TipoAeronave
@@ -20,7 +21,11 @@ class TipoAeronaveReadSerializer(serializers.ModelSerializer):
             "velocidad_crucero_kmh",
             "descripcion",
             "en_produccion",
+            "total_aeronaves",
         ]
+
+    def get_total_aeronaves(self, obj):
+        return obj.aeronaves.count()
 
 
 class TipoAeronaveWriteSerializer(serializers.ModelSerializer):
@@ -44,7 +49,7 @@ class TipoAeronaveWriteSerializer(serializers.ModelSerializer):
         cap_max = attrs.get("capacidad_pasajeros_max")
         if cap_min and cap_max and cap_max < cap_min:
             raise serializers.ValidationError(
-                {"capacidad_pasajeros_max": "La capacidad maxima no puede ser menor a la minima."}
+                {"capacidad_pasajeros_max": "La capacidad máxima no puede ser menor a la mínima."}
             )
 
         fabricante = attrs.get("fabricante", "").strip()
