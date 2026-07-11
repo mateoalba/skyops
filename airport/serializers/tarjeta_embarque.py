@@ -35,10 +35,10 @@ class TarjetaEmbarqueReadSerializer(serializers.ModelSerializer):
         return f"{p.nombre} {p.apellido}"
 
     def get_vuelo_numero(self, obj):
-        return obj.reserva.vuelo.numero
+        return obj.reserva.vuelo.numero_vuelo
 
     def get_vuelo_salida(self, obj):
-        return obj.reserva.vuelo.salida
+        return obj.reserva.vuelo.salida_programada
 
     def get_aerolinea(self, obj):
         return obj.reserva.vuelo.aerolinea.nombre

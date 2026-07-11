@@ -31,7 +31,7 @@ class EquipajeReadSerializer(serializers.ModelSerializer):
         return f"{p.nombre} {p.apellido}"
 
     def get_vuelo_numero(self, obj):
-        return obj.reserva.vuelo.numero
+        return obj.reserva.vuelo.numero_vuelo
 
 
 class EquipajeWriteSerializer(serializers.ModelSerializer):

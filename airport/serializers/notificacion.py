@@ -7,7 +7,7 @@ class NotificacionReadSerializer(serializers.ModelSerializer):
     canal_display  = serializers.CharField(source="get_canal_display", read_only=True)
     estado_display = serializers.CharField(source="get_estado_display", read_only=True)
     pasajero_nombre = serializers.SerializerMethodField()
-    vuelo_numero    = serializers.CharField(source="vuelo.numero", read_only=True, default=None)
+    vuelo_numero    = serializers.CharField(source="vuelo.numero_vuelo", read_only=True, default=None)
 
     class Meta:
         model = Notificacion
