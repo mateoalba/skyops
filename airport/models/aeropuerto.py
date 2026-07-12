@@ -11,6 +11,7 @@ class Aeropuerto(models.Model):
     latitud = models.FloatField()
     longitud = models.FloatField()
     zona_horaria = models.CharField(max_length=50, default="America/Guayaquil")
+    foto_url = models.URLField(blank=True)
 
     class Meta:
         db_table = "aeropuerto"

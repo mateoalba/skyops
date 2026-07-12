@@ -16,6 +16,7 @@ class AeropuertoSerializer(serializers.ModelSerializer):
             "latitud",
             "longitud",
             "zona_horaria",
+            "foto_url",
             "total_puertas",
         ]
         read_only_fields = ["id"]
