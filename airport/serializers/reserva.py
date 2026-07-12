@@ -1,5 +1,63 @@
+from django.utils import timezone
 from rest_framework import serializers
 from airport.models import Reserva
+from airport.models.notificacion import Notificacion
+
+
+# Texto de la notificación automática que recibe el pasajero cada vez que
+# el estado de su reserva cambia (por ejemplo, cuando un admin la confirma).
+# Cubre tanto el alta inicial (create) como cualquier cambio posterior
+# (update/partial_update), sin importar quién lo haga (admin u operador).
+_MENSAJES_ESTADO = {
+    Reserva.Estado.CONFIRMADA: (
+        "confirmacion",
+        "Reserva confirmada",
+        "Tu reserva {codigo} para el vuelo {numero_vuelo} ({origen} → {destino}) fue confirmada.",
+    ),
+    Reserva.Estado.PENDIENTE: (
+        "otro",
+        "Reserva pendiente",
+        "Tu reserva {codigo} para el vuelo {numero_vuelo} ({origen} → {destino}) quedó pendiente de confirmación.",
+    ),
+    Reserva.Estado.CANCELADA: (
+        "cancelacion",
+        "Reserva cancelada",
+        "Tu reserva {codigo} para el vuelo {numero_vuelo} ({origen} → {destino}) fue cancelada.",
+    ),
+    Reserva.Estado.ABORDADA: (
+        "embarque",
+        "Embarque registrado",
+        "Se registró tu embarque para el vuelo {numero_vuelo} ({origen} → {destino}). ¡Buen viaje!",
+    ),
+}
+
+
+def _notificar_estado_reserva(reserva):
+    """Crea una Notificacion para el pasajero dueño de la reserva, con un
+    mensaje según el estado actual (confirmada/pendiente/cancelada/abordada).
+    Se llama al crear una reserva y cada vez que su estado cambia al
+    actualizarla, para que el pasajero se entere sin tener que consultar
+    la app activamente."""
+    tipo, asunto, plantilla = _MENSAJES_ESTADO.get(
+        reserva.estado,
+        ("otro", "Actualización de tu reserva", "Tu reserva {codigo} cambió de estado a " + reserva.get_estado_display() + "."),
+    )
+    mensaje = plantilla.format(
+        codigo=reserva.codigo_reserva,
+        numero_vuelo=reserva.vuelo.numero_vuelo,
+        origen=reserva.vuelo.origen.codigo_iata,
+        destino=reserva.vuelo.destino.codigo_iata,
+    )
+    Notificacion.objects.create(
+        pasajero=reserva.pasajero,
+        vuelo=reserva.vuelo,
+        tipo=tipo,
+        canal="sistema",
+        asunto=asunto,
+        mensaje=mensaje,
+        estado="enviada",
+        fecha_envio=timezone.now(),
+    )
 
 
 class ReservaSerializer(serializers.ModelSerializer):
@@ -61,3 +119,15 @@ class ReservaSerializer(serializers.ModelSerializer):
                 {"pasajero": "Solo puedes crear o editar reservas a tu propio nombre."}
             )
         return data
+
+    def create(self, validated_data):
+        reserva = super().create(validated_data)
+        _notificar_estado_reserva(reserva)
+        return reserva
+
+    def update(self, instance, validated_data):
+        estado_anterior = instance.estado
+        reserva = super().update(instance, validated_data)
+        if reserva.estado != estado_anterior:
+            _notificar_estado_reserva(reserva)
+        return reserva
