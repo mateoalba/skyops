@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.db import transaction, IntegrityError
 from airport.models.perfil_usuario import PerfilUsuario
 from airport.models.pasajero import Pasajero
+from airport.models.sesion_usuario import SesionUsuario
+from airport.utils_sesiones import registrar_sesion
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -26,25 +28,36 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         email = (attrs.get(self.username_field) or "").strip()
         password = attrs.get("password")
+        request = self.context.get("request")
 
         user = User.objects.filter(email__iexact=email).first()
         if user is None:
+            # Correo que no existe: registramos el intento fallido sin
+            # usuario asociado (no sabemos a quién atribuirlo).
+            registrar_sesion(request, None, SesionUsuario.Resultado.FALLIDO)
             raise serializers.ValidationError(
                 {"detail": "Correo o contraseña incorrectos."}
             )
 
         authenticated_user = authenticate(
-            request=self.context.get("request"),
+            request=request,
             username=user.username,
             password=password,
         )
         if authenticated_user is None:
+            registrar_sesion(request, user, SesionUsuario.Resultado.FALLIDO)
             raise serializers.ValidationError(
                 {"detail": "Correo o contraseña incorrectos."}
             )
 
         self.user = authenticated_user
         refresh = self.get_token(self.user)
+        registrar_sesion(
+            request,
+            self.user,
+            SesionUsuario.Resultado.EXITOSO,
+            token_jti=str(refresh["jti"]),
+        )
 
         return {
             "refresh": str(refresh),

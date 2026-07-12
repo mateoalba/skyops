@@ -6,9 +6,12 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.utils import timezone
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
 from airport.models.perfil_usuario import PerfilUsuario
+from airport.models.sesion_usuario import SesionUsuario
+from airport.utils_sesiones import registrar_sesion
 from airport.serializers.auth import (
     CustomTokenObtainPairSerializer,
     RegistroUsuarioSerializer,
@@ -52,6 +55,12 @@ class RegistroView(generics.CreateAPIView):
 
         # Generar tokens automáticamente al registrarse
         refresh = RefreshToken.for_user(user)
+        registrar_sesion(
+            request,
+            user,
+            SesionUsuario.Resultado.EXITOSO,
+            token_jti=str(refresh["jti"]),
+        )
         return Response(
             {
                 "mensaje": "Usuario creado exitosamente.",
@@ -133,6 +142,12 @@ def google_login(request):
         creado = True
 
     refresh = RefreshToken.for_user(user)
+    registrar_sesion(
+        request,
+        user,
+        SesionUsuario.Resultado.EXITOSO,
+        token_jti=str(refresh["jti"]),
+    )
     return Response(
         {
             "mensaje": "Cuenta creada e inicio de sesión con Google." if creado else "Inicio de sesión con Google exitoso.",
@@ -166,7 +181,12 @@ def logout_view(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         token = RefreshToken(refresh_token)
+        jti = str(token.get("jti", "") or "")
         token.blacklist()
+        if jti:
+            SesionUsuario.objects.filter(
+                token_jti=jti, fecha_cierre__isnull=True
+            ).update(fecha_cierre=timezone.now(), resultado=SesionUsuario.Resultado.CERRADO)
         return Response({"mensaje": "Sesión cerrada exitosamente."})
     except Exception:
         return Response(
