@@ -23,6 +23,7 @@ from .sesion_usuario import SesionUsuario
 from .audit_log import AuditLog
 from .mantenimiento_aeronave import MantenimientoAeronave
 from .certificacion_tripulante import CertificacionTripulante
+from .banner_promocional import BannerPromocional
 
 __all__ = [
     "Aerolinea",
@@ -50,4 +51,5 @@ __all__ = [
     "AuditLog",
     "MantenimientoAeronave",
     "CertificacionTripulante",
+    "BannerPromocional",
 ]
