@@ -290,11 +290,15 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
         perfil_data = validated_data.pop("perfil", None)
         instance = super().update(instance, validated_data)
         if perfil_data:
-            perfil = self._perfil(instance)
-            if perfil is not None:
-                for attr, value in perfil_data.items():
-                    setattr(perfil, attr, value)
-                perfil.save()
+            # get_or_create en vez de solo self._perfil(instance): hay
+            # cuentas (p. ej. el superusuario creado con createsuperuser)
+            # que nunca pasaron por el registro de la app y por eso no
+            # tienen fila de PerfilUsuario — sin esto, los cambios (y la
+            # foto) se perdían en silencio porque no había dónde guardarlos.
+            perfil, _ = PerfilUsuario.objects.get_or_create(usuario=instance)
+            for attr, value in perfil_data.items():
+                setattr(perfil, attr, value)
+            perfil.save()
         return instance
 
 
