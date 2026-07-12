@@ -236,6 +236,7 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
     )
     telefono = serializers.CharField(source="perfil.telefono", required=False, allow_blank=True)
     cargo = serializers.SerializerMethodField()
+    es_operador = serializers.SerializerMethodField()
     foto = serializers.SerializerMethodField()
     foto_upload = serializers.ImageField(
         source="perfil.foto", required=False, allow_null=True, write_only=True
@@ -258,6 +259,7 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
             "genero",
             "telefono",
             "cargo",
+            "es_operador",
             "foto",
             "foto_upload",
         ]
@@ -269,6 +271,12 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
     def get_cargo(self, obj):
         p = self._perfil(obj)
         return p.cargo if p else ""
+
+    def get_es_operador(self, obj):
+        # Distinto del campo 'cargo' (que es solo cosmético/informativo):
+        # este es el permiso real que usan EsOperador y las demás
+        # permission_classes del backend (grupo Django "Operadores").
+        return obj.is_staff or obj.groups.filter(name="Operadores").exists()
 
     def get_foto(self, obj):
         p = self._perfil(obj)
