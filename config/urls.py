@@ -21,8 +21,9 @@ urlpatterns = [
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ]
 
-# Sirve las fotos de perfil (y cualquier otro archivo subido) mientras
-# DEBUG=True. En producción con DEBUG=False, un servidor como Nginx debe
-# encargarse de servir MEDIA_URL directamente desde MEDIA_ROOT.
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Sirve las fotos de perfil (y cualquier otro archivo subido). Lo ideal en
+# producción sería que Nginx sirva MEDIA_URL directamente desde MEDIA_ROOT,
+# pero como ese servidor no tiene ese alias configurado, Django se encarga
+# de servirlas siempre (también con DEBUG=False) para que las imágenes no
+# den 404.
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
