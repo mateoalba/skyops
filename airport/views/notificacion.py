@@ -28,7 +28,7 @@ class NotificacionViewSet(viewsets.ModelViewSet):
         user = self.request.user
         qs = Notificacion.objects.select_related("pasajero", "vuelo")
         if not user.is_staff:
-            qs = qs.filter(pasajero__usuario=user)
+            qs = qs.filter(pasajero__email=user.email)
         return qs
 
     def get_serializer_class(self):

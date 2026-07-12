@@ -31,7 +31,7 @@ class EquipajeViewSet(viewsets.ModelViewSet):
         )
         # Un usuario normal solo ve su propio equipaje
         if not user.is_staff:
-            qs = qs.filter(reserva__pasajero__usuario=user)
+            qs = qs.filter(reserva__pasajero__email=user.email)
         return qs
 
     def get_serializer_class(self):
