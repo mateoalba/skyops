@@ -299,6 +299,35 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
             for attr, value in perfil_data.items():
                 setattr(perfil, attr, value)
             perfil.save()
+
+            # Mismo auto-alta que en el registro (ver
+            # RegistroUsuarioSerializer.create): si al editar su perfil el
+            # usuario completa documento + fecha de nacimiento y todavía no
+            # existe un Pasajero con su correo, se crea acá. Así alguien que
+            # se registró sin esos datos (o entró con Google, que no los
+            # trae) puede desbloquear la autoreserva completando su perfil,
+            # sin depender de que un admin le cree el Pasajero a mano.
+            if (
+                perfil.numero_documento
+                and perfil.fecha_nacimiento
+                and instance.email
+                and not Pasajero.objects.filter(email=instance.email).exists()
+            ):
+                try:
+                    with transaction.atomic():
+                        Pasajero.objects.create(
+                            nombre=instance.first_name or instance.email.split("@")[0],
+                            apellido=instance.last_name or "",
+                            num_pasaporte=perfil.numero_documento,
+                            nacionalidad=perfil.pais or "",
+                            fecha_nacimiento=perfil.fecha_nacimiento,
+                            email=instance.email,
+                            telefono=perfil.telefono or "",
+                        )
+                except IntegrityError:
+                    # num_pasaporte ya usado por otro pasajero: no bloquea
+                    # el guardado del perfil, solo se omite la creación.
+                    pass
         return instance
 
 
