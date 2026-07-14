@@ -47,15 +47,16 @@ class Vuelo(models.Model):
     # fijo (ver MULTIPLICADOR_CLASE en airport/serializers/reserva.py) y NO
     # se guardan por separado, para no tener que mantenerlos sincronizados.
     #
-    # filas_primera / filas_ejecutiva definen cuántas filas al frente del
-    # avión son de esa clase (ej. filas_primera=2 -> filas 1-2 son primera).
-    # Las filas siguientes hasta filas_ejecutiva son ejecutiva, y el resto
-    # económica. Si ambos quedan en 0 (valor por defecto, vuelos ya
-    # existentes antes de este campo) no hay restricción de clase por
-    # asiento: cualquier asiento libre se puede elegir en cualquier clase.
+    # asientos_primera / asientos_ejecutiva guardan la lista exacta de
+    # códigos de asiento (ej. "1A,1B,2A,2B") que el admin asignó a cada
+    # clase desde el mapa de asientos al crear/editar el vuelo. Cualquier
+    # asiento que no aparezca en ninguna de las dos listas es económica.
+    # Si ambas quedan vacías (valor por defecto, vuelos ya existentes antes
+    # de este campo) no hay restricción de clase por asiento: cualquier
+    # asiento libre se puede elegir en cualquier clase.
     precio_base = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    filas_primera = models.PositiveIntegerField(default=0, blank=True)
-    filas_ejecutiva = models.PositiveIntegerField(default=0, blank=True)
+    asientos_primera = models.TextField(default="", blank=True)
+    asientos_ejecutiva = models.TextField(default="", blank=True)
 
     class Meta:
         db_table = "vuelo"

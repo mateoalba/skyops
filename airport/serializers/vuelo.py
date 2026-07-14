@@ -10,6 +10,9 @@ class VueloSerializer(serializers.ModelSerializer):
     aeronave_matricula = serializers.CharField(
         source="aeronave.matricula", read_only=True
     )
+    aeronave_capacidad = serializers.IntegerField(
+        source="aeronave.capacidad", read_only=True, default=None
+    )
     origen_codigo = serializers.CharField(
         source="origen.codigo_iata", read_only=True
     )
@@ -38,6 +41,7 @@ class VueloSerializer(serializers.ModelSerializer):
             "aerolinea_nombre",
             "aeronave",
             "aeronave_matricula",
+            "aeronave_capacidad",
             "origen",
             "origen_codigo",
             "origen_ciudad",
@@ -54,8 +58,8 @@ class VueloSerializer(serializers.ModelSerializer):
             "estado_display",
             "duracion_min",
             "precio_base",
-            "filas_primera",
-            "filas_ejecutiva",
+            "asientos_primera",
+            "asientos_ejecutiva",
         ]
         read_only_fields = ["id"]
 
