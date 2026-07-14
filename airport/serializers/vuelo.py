@@ -53,6 +53,9 @@ class VueloSerializer(serializers.ModelSerializer):
             "estado",
             "estado_display",
             "duracion_min",
+            "precio_base",
+            "filas_primera",
+            "filas_ejecutiva",
         ]
         read_only_fields = ["id"]
 

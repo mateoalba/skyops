@@ -43,6 +43,13 @@ class Reserva(models.Model):
     )
     reservado_en = models.DateTimeField(auto_now_add=True)
 
+    # Precio "congelado" en el momento de la reserva (vuelo.precio_base x
+    # multiplicador de la clase elegida). Se calcula una sola vez al crear
+    # o al cambiar de clase/vuelo en una edición — ver ReservaSerializer.
+    # Si después el admin sube el precio_base del vuelo, las reservas ya
+    # hechas NO cambian de precio (igual que en una aerolínea real).
+    precio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
     class Meta:
         db_table = "reserva"
         verbose_name = "Reserva"
