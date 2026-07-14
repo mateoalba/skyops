@@ -33,12 +33,14 @@ class VueloViewSet(viewsets.ModelViewSet):
         pasajero puede pintar el mapa de asientos sin ver datos de otros.
         """
         vuelo = self.get_object()
-        asientos = (
-            vuelo.reservas.exclude(estado="cancelada")
-            .values_list("numero_asiento", flat=True)
-            .distinct()
-        )
-        return Response({"asientos_ocupados": list(asientos)})
+        # Cada reserva puede cubrir varios asientos a la vez (CSV en
+        # numero_asiento, ej. "12A,12B"), así que hay que separarlos antes
+        # de devolver la lista plana de asientos ocupados.
+        crudos = vuelo.reservas.exclude(estado="cancelada").values_list("numero_asiento", flat=True)
+        asientos = set()
+        for valor in crudos:
+            asientos.update(s.strip().upper() for s in (valor or "").split(",") if s.strip())
+        return Response({"asientos_ocupados": sorted(asientos)})
 
     @action(detail=True, methods=["patch"], url_path="cambiar-estado")
     def cambiar_estado(self, request, pk=None):

@@ -31,7 +31,20 @@ class Reserva(models.Model):
     pasajero = models.ForeignKey(
         Pasajero, on_delete=models.CASCADE, related_name="reservas"
     )
-    numero_asiento = models.CharField(max_length=5)
+    # Uno o varios códigos de asiento separados por coma (ej. "12A,12B"),
+    # uno por cada pasajero que SÍ ocupa asiento (adultos + niños; los
+    # bebés viajan en brazos y no cuentan aquí). Antes era un solo asiento
+    # por reserva; ahora una reserva puede cubrir un grupo completo. Ver
+    # validate() en ReservaSerializer para el chequeo de solapamiento
+    # (ya no se puede usar unique_together porque el campo es una lista).
+    numero_asiento = models.CharField(max_length=120)
+    # Desglose de personas cubiertas por esta reserva. pasajeros_adultos
+    # siempre debe ser >= 1 (el titular). El precio se calcula sobre
+    # (pasajeros_adultos + pasajeros_ninos) asientos — ver _calcular_precio
+    # en el serializer.
+    pasajeros_adultos = models.PositiveIntegerField(default=1)
+    pasajeros_ninos = models.PositiveIntegerField(default=0)
+    pasajeros_bebes = models.PositiveIntegerField(default=0)
     clase = models.CharField(
         max_length=20, choices=Clase.choices, default=Clase.ECONOMICA
     )
@@ -55,7 +68,9 @@ class Reserva(models.Model):
         verbose_name = "Reserva"
         verbose_name_plural = "Reservas"
         ordering = ["-reservado_en"]
-        unique_together = ["vuelo", "numero_asiento"]
+        # Ya no hay unique_together de (vuelo, numero_asiento): ese campo
+        # ahora puede contener varios asientos separados por coma, así que
+        # el solapamiento entre reservas se valida a mano en el serializer.
 
     def __str__(self):
         return f"{self.codigo_reserva} | {self.pasajero} | {self.vuelo.numero_vuelo}"
