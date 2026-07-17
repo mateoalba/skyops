@@ -20,7 +20,13 @@ class BannerPromocional(models.Model):
     clave = models.CharField(max_length=40, unique=True)
     titulo = models.CharField(max_length=200, blank=True)
     texto = models.TextField(blank=True)
+    # 'imagen_url' se mantiene por compatibilidad (permite pegar un link a
+    # mano), pero el flujo normal ahora es subir un archivo directamente
+    # desde el dispositivo del admin -> 'imagen'. Si 'imagen' tiene un
+    # archivo, el serializer lo prioriza sobre 'imagen_url' al armar la URL
+    # final que consume Flutter (ver BannerPromocionalSerializer.get_imagen_url).
     imagen_url = models.URLField(blank=True)
+    imagen = models.ImageField(upload_to="banners/", null=True, blank=True)
     actualizado_en = models.DateTimeField(auto_now=True)
 
     class Meta:
