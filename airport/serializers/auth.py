@@ -25,6 +25,14 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["is_staff"] = user.is_staff
         return token
 
+    @staticmethod
+    def _es_operador(user):
+        # Mismo criterio que PerfilUsuarioSerializer.get_es_operador y que
+        # permissions.EsOperador: admin siempre cuenta como operador, o
+        # pertenecer al grupo Django "Operadores". Es el permiso real (no
+        # cosmético) que el frontend usa para mostrar/ocultar acciones.
+        return user.is_staff or user.groups.filter(name="Operadores").exists()
+
     def validate(self, attrs):
         email = (attrs.get(self.username_field) or "").strip()
         password = attrs.get("password")
@@ -69,6 +77,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 "nombre": self.user.first_name,
                 "apellido": self.user.last_name,
                 "es_staff": self.user.is_staff,
+                "es_operador": self._es_operador(self.user),
             },
         }
 

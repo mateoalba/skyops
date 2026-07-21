@@ -11,7 +11,12 @@ class Aeropuerto(models.Model):
     latitud = models.FloatField()
     longitud = models.FloatField()
     zona_horaria = models.CharField(max_length=50, default="America/Guayaquil")
+    # 'foto_url' se mantiene por compatibilidad (permite pegar un link a
+    # mano); el flujo normal ahora es subir un archivo directamente desde
+    # el dispositivo del admin -> 'foto'. Si 'foto' tiene un archivo, el
+    # serializer lo prioriza sobre 'foto_url' (ver AeropuertoSerializer).
     foto_url = models.URLField(blank=True)
+    foto = models.ImageField(upload_to="aeropuertos/", null=True, blank=True)
 
     class Meta:
         db_table = "aeropuerto"
