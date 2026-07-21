@@ -80,14 +80,15 @@ class EsPropietarioOAdmin(BasePermission):
 
 class SoloLectura(BasePermission):
     """
-    Permite solo métodos seguros (GET, HEAD, OPTIONS).
+    Lectura pública (GET, HEAD, OPTIONS) para cualquiera, con o sin sesión.
+    Se usa en catálogos de referencia (aerolíneas, aeropuertos, aeronaves,
+    puertas) que un visitante debe poder ver para buscar vuelos sin crear
+    cuenta primero — igual que en cualquier buscador de aerolíneas real.
+    Escribir (POST/PUT/PATCH/DELETE) sigue exigiendo el permiso que cada
+    ViewSet use aparte para esos métodos (normalmente EsOperador).
     """
     def has_permission(self, request, view):
-        return bool(
-            request.user and
-            request.user.is_authenticated and
-            request.method in SAFE_METHODS
-        )
+        return request.method in SAFE_METHODS
 # Aliases para compatibilidad
 IsOwnerOrAdmin = EsPropietarioOAdmin
 IsAdminUser = EsAdmin

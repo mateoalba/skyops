@@ -1,10 +1,10 @@
-from rest_framework import viewsets, filters, status
+from rest_framework import viewsets, filters, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from airport.models import Vuelo
 from airport.serializers import VueloSerializer
-from airport.permissions import EsOperador, SoloLectura
+from airport.permissions import EsOperador
 from airport.filters import VueloFilter
 
 
@@ -20,8 +20,11 @@ class VueloViewSet(viewsets.ModelViewSet):
     ordering = ["salida_programada"]
 
     def get_permissions(self):
+        # Buscar y ver vuelos es público a propósito (como en cualquier
+        # buscador de aerolíneas): un visitante sin cuenta debe poder ver
+        # los resultados. Solo reservar/editar/eliminar exige rol Operador.
         if self.action in ["list", "retrieve", "por_ruta", "asientos_ocupados"]:
-            return [SoloLectura()]
+            return [permissions.AllowAny()]
         return [EsOperador()]
 
     @action(detail=True, methods=["get"], url_path="asientos-ocupados")
