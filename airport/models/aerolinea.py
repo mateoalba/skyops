@@ -8,6 +8,11 @@ class Aerolinea(models.Model):
     codigo_iata = models.CharField(max_length=3, unique=True)
     pais = models.CharField(max_length=100)
     activa = models.BooleanField(default=True)
+    # 'logo_url' guarda un link pegado a mano (compat con aerolíneas viejas),
+    # 'logo' es el archivo subido desde el panel — mismo patrón que
+    # Aeropuerto.foto_url / Aeropuerto.foto.
+    logo_url = models.URLField(blank=True)
+    logo = models.ImageField(upload_to="aerolineas/", null=True, blank=True)
     creado_en = models.DateTimeField(auto_now_add=True)
 
     class Meta:
