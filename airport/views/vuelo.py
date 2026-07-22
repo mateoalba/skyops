@@ -9,6 +9,31 @@ from airport.permissions import EsOperador
 from airport.filters import VueloFilter
 
 
+def _sincronizar_estados_pendientes():
+    """
+    Antes de cualquier lectura, pone al día en la base los vuelos cuyo
+    estado ya no corresponde a la hora actual (ver Vuelo.estado_efectivo) —
+    así el filtro `?estado=despegado` también encuentra los que recién
+    "despegaron" según el reloj, no solo los que alguien marcó a mano a
+    tiempo. No hay un cron/job en segundo plano en este proyecto: se
+    recalcula "perezosamente" justo antes de servir cualquier respuesta.
+    Cancelado, Retrasado y Aterrizado nunca entran acá: los dos primeros son
+    overrides manuales que no se tocan solos, y Aterrizado ya es un estado
+    final que no vuelve a cambiar.
+    """
+    pendientes = Vuelo.objects.exclude(
+        estado__in=[Vuelo.Estado.CANCELADO, Vuelo.Estado.RETRASADO, Vuelo.Estado.ATERRIZADO]
+    )
+    a_actualizar = []
+    for vuelo in pendientes:
+        nuevo_estado = vuelo.estado_efectivo()
+        if nuevo_estado != vuelo.estado:
+            vuelo.estado = nuevo_estado
+            a_actualizar.append(vuelo)
+    if a_actualizar:
+        Vuelo.objects.bulk_update(a_actualizar, ["estado"])
+
+
 class VueloViewSet(viewsets.ModelViewSet):
     queryset = Vuelo.objects.select_related(
         "aerolinea", "aeronave", "origen", "destino", "puerta"
@@ -21,6 +46,7 @@ class VueloViewSet(viewsets.ModelViewSet):
     ordering = ["salida_programada"]
 
     def get_queryset(self):
+        _sincronizar_estados_pendientes()
         queryset = super().get_queryset()
         # El listado público (buscador de vuelos, "Ofertas desde") no debe
         # mostrar vuelos que ya pasaron: no tiene sentido "reservar" algo que

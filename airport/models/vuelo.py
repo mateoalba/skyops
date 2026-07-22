@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.utils import timezone
 from .aerolinea import Aerolinea
 from .aeronave import Aeronave
 from .aeropuerto import Aeropuerto
@@ -67,3 +68,25 @@ class Vuelo(models.Model):
 
     def __str__(self):
         return f"{self.numero_vuelo} | {self.origen.codigo_iata} → {self.destino.codigo_iata} | {self.salida_programada.strftime('%d/%m/%Y %H:%M')}"
+
+    def estado_efectivo(self):
+        """
+        Estado real según la hora actual, sin necesitar que nadie lo cambie
+        a mano: Programado hasta 1 hora antes de la salida, Embarcando en
+        esa última hora, Despegado entre la salida y la llegada programadas,
+        y Aterrizado después de la llegada programada. Cancelado y Retrasado
+        son overrides manuales (los pone un operador desde el panel cuando
+        de verdad pasa algo fuera de lo programado) y nunca se pisan solos
+        acá, sin importar la hora.
+        """
+        if self.estado in (self.Estado.CANCELADO, self.Estado.RETRASADO):
+            return self.estado
+        ahora = timezone.now()
+        una_hora_antes_salida = self.salida_programada - timezone.timedelta(hours=1)
+        if ahora < una_hora_antes_salida:
+            return self.Estado.PROGRAMADO
+        if ahora < self.salida_programada:
+            return self.Estado.EMBARCANDO
+        if ahora < self.llegada_programada:
+            return self.Estado.DESPEGADO
+        return self.Estado.ATERRIZADO
