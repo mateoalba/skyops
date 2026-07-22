@@ -21,6 +21,11 @@ class Aeronave(models.Model):
     estado = models.CharField(
         max_length=20, choices=Estado.choices, default=Estado.ACTIVA
     )
+    # 'foto_url' guarda un link pegado a mano, 'foto' es el archivo subido
+    # desde el panel — mismo patrón que Aeropuerto.foto_url / Aeropuerto.foto
+    # y Aerolinea.logo_url / Aerolinea.logo.
+    foto_url = models.URLField(blank=True)
+    foto = models.ImageField(upload_to="aeronaves/", null=True, blank=True)
 
     class Meta:
         db_table = "aeronave"
