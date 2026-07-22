@@ -46,7 +46,11 @@ class AeronaveFilter(django_filters.FilterSet):
 
 
 class PuertaFilter(django_filters.FilterSet):
-    terminal = django_filters.CharFilter(lookup_expr="icontains")
+    # 'terminal' ahora es una FK real (antes era texto libre con icontains).
+    terminal = django_filters.UUIDFilter(field_name="terminal__id")
+    terminal_codigo = django_filters.CharFilter(
+        field_name="terminal__codigo", lookup_expr="iexact"
+    )
     estado = django_filters.ChoiceFilter(choices=Puerta.Estado.choices)
     aeropuerto = django_filters.UUIDFilter(field_name="aeropuerto__id")
     aeropuerto_codigo = django_filters.CharFilter(
@@ -55,7 +59,7 @@ class PuertaFilter(django_filters.FilterSet):
 
     class Meta:
         model = Puerta
-        fields = ["terminal", "estado", "aeropuerto", "aeropuerto_codigo"]
+        fields = ["terminal", "terminal_codigo", "estado", "aeropuerto", "aeropuerto_codigo"]
 
 
 class VueloFilter(django_filters.FilterSet):
