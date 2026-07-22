@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import viewsets, filters, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -18,6 +19,24 @@ class VueloViewSet(viewsets.ModelViewSet):
     search_fields = ["numero_vuelo", "origen__codigo_iata", "destino__codigo_iata"]
     ordering_fields = ["salida_programada", "llegada_programada", "numero_vuelo", "duracion_min"]
     ordering = ["salida_programada"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # El listado público (buscador de vuelos, "Ofertas desde") no debe
+        # mostrar vuelos que ya pasaron: no tiene sentido "reservar" algo que
+        # ya salió. No se borran de la base de datos (las reservas ya hechas
+        # sobre ellos siguen intactas en /reservas/ y en "Mis reservas", que
+        # consultan Reserva por su propia FK y nunca pasan por este listado)
+        # — solo se ocultan del listado. El panel admin (/admin/vuelos) sí
+        # necesita ver el historial completo para poder gestionarlo, así que
+        # manda `incluir_pasados=true` para saltarse este filtro.
+        if self.action == "list":
+            incluir_pasados = self.request.query_params.get("incluir_pasados", "").lower() in (
+                "1", "true", "si", "sí", "yes",
+            )
+            if not incluir_pasados:
+                queryset = queryset.filter(salida_programada__gte=timezone.now())
+        return queryset
 
     def get_permissions(self):
         # Buscar y ver vuelos es público a propósito (como en cualquier
