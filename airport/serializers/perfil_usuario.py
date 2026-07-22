@@ -19,6 +19,9 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
         source="get_genero_display", read_only=True
     )
     cargo_display = serializers.CharField(source="get_cargo_display", read_only=True)
+    # Mismo patrón que AeropuertoSerializer.foto_resuelta: prioriza el
+    # archivo subido y si no hay, cae al link manual guardado en 'foto_url'.
+    foto_resuelta = serializers.SerializerMethodField()
 
     class Meta:
         model = PerfilUsuario
@@ -42,6 +45,8 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
             "cargo",
             "cargo_display",
             "foto_url",
+            "foto",
+            "foto_resuelta",
             "activo",
             "creado_en",
             "actualizado_en",
@@ -50,6 +55,13 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
 
     def get_nombre_completo(self, obj):
         return f"{obj.usuario.first_name} {obj.usuario.last_name}".strip()
+
+    def get_foto_resuelta(self, obj):
+        if obj.foto:
+            request = self.context.get("request")
+            url = obj.foto.url
+            return request.build_absolute_uri(url) if request else url
+        return obj.foto_url or None
 
     def validate_numero_documento(self, value):
         if len(value) < 8:
