@@ -12,7 +12,7 @@ from airport.views import (
     logout_view, PerfilView, cambiar_password, google_login,
     PerfilUsuarioViewSet, SesionUsuarioViewSet, AuditLogViewSet,
     MantenimientoAeronaveViewSet, CertificacionTripulanteViewSet,
-    BannerPromocionalViewSet,
+    BannerPromocionalViewSet, ContenidoInstitucionalViewSet,
 )
 
 router = DefaultRouter()
@@ -42,6 +42,7 @@ router.register("audit-log", AuditLogViewSet, basename="audit-log")
 router.register("mantenimientos", MantenimientoAeronaveViewSet, basename="mantenimiento")
 router.register("certificaciones", CertificacionTripulanteViewSet, basename="certificacion")
 router.register("banners", BannerPromocionalViewSet, basename="banner")
+router.register("contenido-institucional", ContenidoInstitucionalViewSet, basename="contenido-institucional")
 
 auth_urlpatterns = [
     path("login/", LoginView.as_view(), name="auth-login"),

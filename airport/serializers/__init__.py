@@ -25,6 +25,7 @@ from .auth import (
     CambiarPasswordSerializer,
 )
 from .banner_promocional import BannerPromocionalSerializer
+from .contenido_institucional import ContenidoInstitucionalSerializer
 
 __all__ = [
     "AerolineaSerializer",
@@ -57,4 +58,5 @@ __all__ = [
     "PerfilUsuarioSerializer",
     "CambiarPasswordSerializer",
     "BannerPromocionalSerializer",
+    "ContenidoInstitucionalSerializer",
 ]

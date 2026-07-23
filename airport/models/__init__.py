@@ -24,6 +24,7 @@ from .audit_log import AuditLog
 from .mantenimiento_aeronave import MantenimientoAeronave
 from .certificacion_tripulante import CertificacionTripulante
 from .banner_promocional import BannerPromocional
+from .contenido_institucional import ContenidoInstitucional
 
 __all__ = [
     "Aerolinea",
@@ -52,4 +53,5 @@ __all__ = [
     "MantenimientoAeronave",
     "CertificacionTripulante",
     "BannerPromocional",
+    "ContenidoInstitucional",
 ]

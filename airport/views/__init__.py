@@ -34,6 +34,7 @@ from .audit_log import AuditLogViewSet
 from .mantenimiento_aeronave import MantenimientoAeronaveViewSet
 from .certificacion_tripulante import CertificacionTripulanteViewSet
 from .banner_promocional import BannerPromocionalViewSet
+from .contenido_institucional import ContenidoInstitucionalViewSet
 
 __all__ = [
     "AerolineaViewSet",
@@ -70,4 +71,5 @@ __all__ = [
     "MantenimientoAeronaveViewSet",
     "CertificacionTripulanteViewSet",
     "BannerPromocionalViewSet",
+    "ContenidoInstitucionalViewSet",
 ]
