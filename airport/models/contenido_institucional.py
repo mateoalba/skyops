@@ -23,6 +23,12 @@ class ContenidoInstitucional(models.Model):
     titulo = models.CharField(max_length=200, blank=True)
     texto = models.TextField(blank=True)
     items = models.JSONField(default=list, blank=True)
+    # Mismo patrón que BannerPromocional.imagen/imagen_url: 'imagen' es el
+    # archivo subido desde el panel admin, 'imagen_url' un link pegado a
+    # mano (compat); el serializer prioriza el archivo subido al armar la
+    # URL final. Solo los bloques "hero" de cada página usan esto por ahora.
+    imagen_url = models.URLField(blank=True)
+    imagen = models.ImageField(upload_to="contenido_institucional/", null=True, blank=True)
     actualizado_en = models.DateTimeField(auto_now=True)
 
     class Meta:
