@@ -1,8 +1,11 @@
 import json
+import uuid
 
-from rest_framework import viewsets, permissions
+from django.core.files.storage import default_storage
+from rest_framework import viewsets, permissions, status
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from airport.models.contenido_institucional import ContenidoInstitucional
 from airport.serializers.contenido_institucional import ContenidoInstitucionalSerializer
 from airport.permissions import EsAdmin
@@ -67,3 +70,32 @@ class ContenidoInstitucionalViewSet(viewsets.ViewSet):
 
     def partial_update(self, request, pk=None):
         return self.update(request, pk=pk)
+
+
+class ContenidoInstitucionalImagenView(APIView):
+    """
+    POST /api/contenido-institucional/subir-imagen/  (solo admin)
+
+    Endpoint genérico para las imágenes de cada tarjeta dentro de un bloque
+    de lista (features, integrantes del equipo, novedades, repositorios...).
+    A diferencia de la imagen de bloque (arriba, un archivo por 'clave'),
+    acá cada tarjeta necesita su propio archivo y 'items' es una lista de
+    tamaño variable — así que en vez de modelar una relación nueva, este
+    endpoint solo guarda el archivo y devuelve su URL; el frontend guarda
+    esa URL directo en el campo 'imagenUrl' del ítem correspondiente dentro
+    del JSON de 'items' (sin campo nuevo en el modelo, sin migración).
+    """
+
+    permission_classes = [EsAdmin]
+    parser_classes = [MultiPartParser]
+
+    def post(self, request):
+        archivo = request.FILES.get("archivo")
+        if not archivo:
+            return Response({"detail": "Falta el archivo."}, status=status.HTTP_400_BAD_REQUEST)
+        nombre = f"contenido_institucional_items/{uuid.uuid4().hex}_{archivo.name}"
+        ruta_guardada = default_storage.save(nombre, archivo)
+        url = default_storage.url(ruta_guardada)
+        if not url.startswith("http"):
+            url = request.build_absolute_uri(url)
+        return Response({"imagen_url": url})

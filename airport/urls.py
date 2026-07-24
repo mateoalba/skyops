@@ -12,7 +12,7 @@ from airport.views import (
     logout_view, PerfilView, cambiar_password, google_login,
     PerfilUsuarioViewSet, SesionUsuarioViewSet, AuditLogViewSet,
     MantenimientoAeronaveViewSet, CertificacionTripulanteViewSet,
-    BannerPromocionalViewSet, ContenidoInstitucionalViewSet,
+    BannerPromocionalViewSet, ContenidoInstitucionalViewSet, ContenidoInstitucionalImagenView,
 )
 
 router = DefaultRouter()
@@ -57,5 +57,14 @@ auth_urlpatterns = [
 urlpatterns = [
     path("health/", health_check, name="health"),
     path("auth/", include(auth_urlpatterns)),
+    # Ruta literal antes del router: el router también registra
+    # 'contenido-institucional/<pk>/' (detail route de update/partial_update),
+    # y si esta fuera después, Django probaría esa regex primero y
+    # respondería 405 (esa ruta no acepta POST) en vez de llegar a esta vista.
+    path(
+        "contenido-institucional/subir-imagen/",
+        ContenidoInstitucionalImagenView.as_view(),
+        name="contenido-institucional-subir-imagen",
+    ),
     path("", include(router.urls)),
 ]
